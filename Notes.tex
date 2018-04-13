@@ -1,0 +1,259 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc} 	% L'encodage. Ca peut Ãªtre Ã  remplacer par \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\def\ques{\noindent{\bf Question : }}
+\usepackage[english]{babel}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}		% Les marges
+%\usepackage{listings}		% Pour mettre du code dans le fichier, il suffira ensuite d'appeler \begin{lstlisting}
+%\lstset{
+%language=Python,        	% choix du langage : C, Python, R, PHP...
+%basicstyle=\footnotesize\color{mygray},       % taille de la police du code
+%numbers=left,                   % placer les numÃ©ros de lignes Ã  droite (right) ou Ã  gauche (left)
+%numberstyle=\footnotesize,        % taille de la police des numÃ©ros
+%numbersep=7pt,                  % distance entre le code et sa numÃ©rotation
+%stepnumber=1,
+%tabsize=4
+%}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\setcounter{theorem}{0}
+\usepackage{comment} 
+\usepackage{float}
+%\usepackage{capt-of}
+\usepackage{graphicx}	% Si besoin de bosser sur des images. Si besoin, aller sur le SDZ.
+\usepackage{color}
+\definecolor{mygray}{rgb}{0.2,0.2,0.2}
+\usepackage{multicol}
+% Les packages pour mettre des expressions un peu mathÃ©matisÃ©es.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+%\usepackage{mathtools}
+%\usepackage{dsfont}
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+
+\newtheorem{question}{Q}
+\title{	
+\normalfont \normalsize 
+\textsc{M2 PMA -- Elsa TEULIERE -- 2017-2018} \\ [25pt] % Your university, school and/or department name(s)
+\vspace{-0.8cm}
+\horrule{0.5pt}  % Thin top horizontal rule
+\textbf{Estimation of Poisson log-normale distributions using composite likelihood}
+\vspace{-0.8cm}
+\horrule{0.5pt}  % Thin top horizontal rule
+}
+
+\date{}
+\author{}
+\graphicspath{ {./figures/} }
+ 
+
+\begin{document}
+\maketitle
+\vspace{1cm}
+
+\section{Model and notations}
+We have $n$ observations of a sample with the covariables, $(x^i)_{i \in \{1,...,n\}}$ and the data we want to analyse $(Y^i)_{i \in \{1,...,n\}}$. For each $i$, $Y^i \in \mathbb{N}^n$ and $x^i \in \mathbb{R}^p$
+
+\subsection{Poisson log-normale distribution}
+We suppose that the data follow a Poisson-log-normale distribution with parameters $mu$,$\Sigma$ \cite{aitchison1989multivariate}.\\
+This means that given $Z^{i} \sim \mathcal{N}_{d}(0,\Sigma)$, for all $j \in \{1,...,d\}, Y^i_j \mid Z^i_j \sim \mathcal{P}(e^{x^i \mu_j + Z^i_j})$. All the dependency between the variables is encoded in the matrix $\Sigma$.\\
+We can remind here some results about the Poisson-log-normale distribution :
+\begin{enumerate}
+\item The density of a Poisson-log-normale distribution :\\ For $y \in \mathbb{N}^d$, $p_{(\mu,\Sigma \mid X)}(y)=  \int_{\mathbb(R)^d} \prod_{j=1}^{d}f_{exp(X\mu_j+\theta_j)}(y_j)g_{0,\Sigma}(\theta)\mathrm{d}\theta$ with $X$ the covariables, $f_{\mathrm{exp}(X\mu_j+\theta_j)}$ the density function of a Poisson variable of parameters $\mathrm{exp}(X\mu_j+\theta_j)$  and $g_{0, \Sigma}(\theta)$ the density distribution of a $\mathcal{N}_d(0,\Sigma)$.
+\item The moments of a Poisson-log-normale distribution : \\
+$\mathrm{E}(Y^i_j)=exp(x^i\mu_j+\frac{1}{2}\sigma^2_j)$\\
+$\mathrm{Var}(Y^i_j)=exp(x^i\mu_j+\frac{1}{2}\sigma^2_j)+(exp(x^i\mu_j+\frac{1}{2}\sigma^2_j))^2(exp(\sigma^2_j)-1)$\\
+$\mathrm(cov)(Y^i_j,Y^i_k)=exp(x^i\mu_j+\frac{1}{2}\sigma^2_j)exp(x^i\mu_k+\frac{1}{2}\sigma^2_k)(exp(\sigma_{jk} - 1)$.
+\end{enumerate}
+
+\subsection{Composite likelihood and M-estimators}
+\subsubsection{Composite likelihood}
+We use the marginal composite likelihood, also called peudo-likelihood (see \cite{varin2011overview}).In our case we have $\mathcal{L}_C(Y^1,..., Y^n,\mu,\sigma \mid X) = \prod_{i=1}^{n} \prod_{k<j} p_{(\mu,\Sigma \mid X)}{(Y^i_j,Y^i_k)}$. As we do with the likelihhod, we can consider the log-composite likelihood :
+$\mathcal{CL}(Y^1,..., Y^n,\mu,\sigma \mid X) = \sum_{i=1}^{n} \sum_{k<j} \mathrm{log}(p_{(\mu',\Sigma', \mid X)}(Y^i_j,Y^i_k)$. Where $\mu'=(\mu_j,\mu_k)$ and $ \Sigma' =(\sigma_{l,p})_{(l,p) \in \{j,k\}^2} $. We introduce the notation $\mathrm{H}_{(\mu,\Sigma \mid X)}(Y^i_j,Y^i_k)=\mathrm{log}(p_{(\mu',\Sigma' \mid X)}(Y^i_j,Y^i_k)$. 
+\subsubsection{M-estimators theory and composite likelihood}
+Following the definition given by Van der Vaart \cite{vaart_1998}, the log-composite likelihood can be considered as a M-estimator. We have $\mathrm{M}_n : \theta \mapsto \sum_{i=1}^{n} \mathrm{m}_n(\theta)= \sum_{k<j} \mathrm{log}(p_{(\mu',\Sigma', \mid X)}(Y^i_j,Y^i_k)$. We recall here the fundamental theorem of the theory of M-estimators :\\
+\\
+\begin{theorem} \label{ThMest}
+Let $(\mathrm{M}_n)$ be a random sequence of functions and $M$ a determinist set of function. If 
+\begin{enumerate}
+\item $\underset{\theta \in \Theta}{\mathrm{sup}} \mid \mathrm{M}_n(\theta)-\mathrm{M}(\theta) \mid \overset{\mathbb{P}}{\longrightarrow} 0$
+\item the maximum $\theta^\ast$ of M is unique.
+\end{enumerate}
+Then any sequence of estimators $\widehat{\theta}_n$ with $\mathrm{M}_n(\widehat{\theta}_n \geq \mathrm{M}_n(\theta^\ast)-\circ_p(1)$ converges in probability to $\theta^\ast$.
+\end{theorem}
+
+
+\section{Maximum of the composite likelihood}
+The composite likelihood allows us to solve the problem separetly for each marginal likelihood. Here we look for the maximum of $\mathrm{H}_{(\mu',\Sigma' \mid X)}(Y_1,Y_2)$ where $Y$ is distributed as the observations. One have : 
+\begin{equation}
+p_{(\mu',\Sigma' \mid X)}(Y_1,Y_2)=\int_{\mathbb{R}^2}\frac{\mathrm{e}^{Y_1(X \mu_1+z_1)}}{Y_1 !} \frac{\mathrm{e}^{Y_2(X \mu_2+z_2)}}{Y_2 !} \frac{\mathrm{e}^{-\mathrm{exp}(X\mu_1+z_1)}\mathrm{e}^{-\mathrm{exp}(X\mu_2+z_2)}}{2 \pi \sqrt{\mid \mathrm{det}(\Sigma') \mid} } \mathrm{e}^{-\frac{1}{2} (z_1,z_2) \Sigma'^{-1} (z_1,z_2)^T} \mathrm{d}z_1 \mathrm{d}z_2
+\end{equation}
+We note $ \mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) =\frac{\mathrm{e}^{Y_1(X \mu_1+z_1)}}{Y_1 !} \frac{\mathrm{e}^{Y_2(X \mu_2+z_2)}}{Y_2 !} \frac{\mathrm{e}^{-\mathrm{exp}(X\mu_1+z_1)}\mathrm{e}^{-\mathrm{exp}(X\mu_2+z_2)}}{2 \pi \sqrt{\mid \mathrm{det}(\Sigma') \mid} } \mathrm{e}^{-\frac{1}{2} (z_1,z_2) \Sigma'^{-1} (z_1,z_2)^T} $
+\begin{equation}
+\mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2)= f_{\mathrm{exp}(X \mu_1+z_1)}(Y_1) f_{\mathrm{exp}(X \mu_2+z_2)}(Y_2) g_{0, \Sigma}(z_1,z_2)
+\end{equation}
+
+We see here that the dependency in the variables of interest ($ \mu_1$, $\mu_2$, $ \sigma_{1,1}$, $\sigma_{2,2}$, $\sigma_{1,2}$) is split.
+\begin{comment}
+\subsection{Derivatives of the composite likelihood}
+\subsubsection{With respect to $\mu_{1}$/$\mu_{2}$}
+$\mu_1$, $\mu_2$ play symetric roles. 
+\begin{equation}
+\frac{\partial \mathrm{h}_{(\mu',\Sigma'\mid X)}}{\partial \mu_1}(z_1,z_2,Y_1,Y_2) = X (Y_1- \mathrm{e}^{X \mu_1 +z_1}) \mathrm{h}_{(\mu', \Sigma'\mid X)}(z_1,z_2,Y_1,Y_2)
+\end{equation}
+
+Derivating under the $ \int$ and composing with the derivative of the logarithm, we have :
+
+\begin{align}
+\frac{\partial \mathrm{H}_{(\mu',\Sigma' \mid X)}}{\partial \mu_1}(Y_1,Y_2) & = &  \frac{\int_{\mathbb{R}^2} X(Y_1- \mathrm{e}^{X\mu_1+z_1 }) \mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2}{\int_{\mathbb{R}^2}\mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2}\\
+& = & X ( Y_1- (Y_1 + 1) \frac{p_{(\mu', \Sigma' \mid X)}(Y_1 +1, Y_2)}{p_{(\mu', \Sigma' \mid X)}(Y_1 , Y_2)})
+\end{align}
+
+\subsubsection{With respect to $\sigma_{1,1}$/$\sigma_{2,2}$}
+In order to derive with respetc to the $\sigma$ variables we have to consider the reciprocal of the $\Sigma'$-matrix. So one have :
+\begin{equation}
+g_{(0,\Sigma')} (z_1,z_2) = \frac{1}{2 \pi \sqrt{\mid \sigma_{11} \sigma_{22}- \sigma_{12}^2 \mid}} \mathrm{e}^{-\frac{1}{2}\frac{2 \sigma_{12} z_1 z_2 - \sigma_{22} z_1^2 - \sigma_{11} z_2^2}{\sigma_{12}^2-\sigma_{11} \sigma_{22}}}
+\end{equation}
+
+Here again $\sigma_{1,1}$ and $\sigma_{2,2}$ play symetric roles.
+
+We note $\frac{(-) \sigma_{22}}{4 \pi (\mid \sigma_{11} \sigma_{22}- \sigma_{12}^2 \mid ) ^{\frac{3}{2}} }$ the derivative of $ \frac{1}{2 \pi \sqrt{\mid \sigma_{11} \sigma_{22}- \sigma_{12}^2 \mid}}$ with respect to $\sigma_{11}$ depending on the sign of $ \sigma_{11} \sigma_{22}- \sigma_{12}^2 $.
+\begin{equation}
+\frac{\partial g_{(0,\Sigma ')}}{\partial \sigma_{11}} (z_1,z_2) = ( \frac{(-) \sigma_{22}}{2 (\mid \sigma_{12}^2- \sigma_{11} \sigma_{22} \mid)^{\frac{3}{2}}} - ( \frac{\sigma_{12} z_{2} - \sigma_{22} z_{1}}{(\sigma_{12}^2- \sigma_{11} \sigma_{22})})^2 ) g_{(0,\Sigma')}(z_1,z_2)
+\end{equation}
+
+So derivating under the $_int$ and composing with the log-function, one have :
+\begin{equation}
+\frac{\partial \mathrm{H}_{(\mu',\Sigma ' \mid X)}}{\partial \sigma_{11}} (Y_1,Y_2) =\frac{\int_{\mathbb{R}^2}( \frac{(-) \sigma_{22}}{2 (\mid \sigma_{12}^2- \sigma_{11} \sigma_{22} \mid)^{\frac{3}{2}}} - ( \frac{\sigma_{12} z_{2} - \sigma_{22} z_{1} - \sigma_{11} z_2}{\sigma_{12}^2- \sigma_{11} \sigma_{22}})^2 ) \mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2} {\int_{\mathbb{R}^2 }\mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2}
+\end{equation}
+
+\subsubsection{With respect to $\sigma_{12}$}
+We use the same notation than in the previous section for the derivative with respect to $\sigma_{12}$ fo the mornalization term of the normale distribution density function.\\
+We have :
+\begin{equation}
+\frac{\partial g_{(0,\Sigma ')}}{\partial \sigma_{12}} (z_1,z_2) = (\frac{(-) \sigma_{12}}{\mid \sigma_{12}^2 - \sigma_{11} \sigma_{22} \mid} + \frac{\sigma_{12} ( 2 \sigma_{11} z_1 + 2 \sigma_{22} z _1 - \sigma_{11} \sigma{22} z_1 z_2}{(\sigma_{12}^2 - \sigma_{11} \sigma_{22})^2})  g_{(0,\Sigma ')}(z_1,z_2)
+\end{equation}
+
+So :
+\begin{equation}
+\frac{\partial \mathrm{H}_{(\mu',\Sigma ' \mid X)}}{\partial \sigma_{12}} (Y_1,Y_2) =\frac{\int_{\mathbb{R}^2}(\frac{(-) \sigma_{12}}{\mid \sigma_{12}^2 - \sigma_{11} \sigma_{22} \mid} + \frac{\sigma_{12} ( 2 \sigma_{11} z_1 + 2 \sigma_{22} z _1 - \sigma_{11} \sigma{22} z_1 z_2}{(\sigma_{12}^2 - \sigma_{11} \sigma_{22})^2}) \mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2} {\int_{\mathbb{R}^2 }\mathrm{h}_{(\mu',\Sigma' \mid X)}(z_1,z_2,Y_1,Y_2) \mathrm{d}z_1 \mathrm{d}z_2}
+\end{equation}
+\end{comment}
+
+\subsection{Using the results of the maximum likelihood for the composite maximum likelihood.}
+
+To maximize the composite likelihood, it is sufficient to maximize all the terms separetly, \textit{i.e.} to maximize for each couple $(j,k) \in \{1,...,d\}$ the quantity $\frac{1}{n} \sum_{i=1}^{n} log(p_{(\mu,\Sigma \mid X)} (Y^i_j,Y^i_k))$. We observe that this quantity is just a regular maximum likelihood. We show that for each couple of variables the maximum-likelihood estimator is consistent. We then use this result in order to show the consistence of the estimator of the composite likelihood.
+
+\begin{comment}
+ We will now follow the following path : first we will show that for one couple $(j,k)$ we do estimate the exact parameters. This consists in showing that the considered quantity converge in probability to a function of the parameters, then showing that the model is identifiable and finely showing that, in our case, the maximum likelihood function only have one maximum wich will be our estimator. Once we shew that for one couple, we will use this in order to estimate the composite-maximum-likelihood estimator. We will have to show again the convergence in probability and the identifiability. To find the composite-maximum-likelihood estimator we will maximize component by component and thus construct the maximum likelihood estimator.
+\end{comment} 
+ 
+
+\subsubsection{For one couple of variables} 
+
+Consider a couple of random variables $(Y_j,Y_k)$ of a vector of random variables $Y=(Y_i)_{i \in \{1...n\}}$ following a $\mathcal{PLN}(\mu,\Sigma)$-distribution, with $\mu=(\mu_{i})_{i \in \{1...n\}}$ and $\Sigma= (\sigma_{il})_{(i,l) \in \{1...n\}^2}$. This couple is distributed as a $\mathcal{PLN}(\mu_{jk},\Sigma_{jk})$ law, with $\mu_{jk}=(\mu_j,\mu_k)$ and $\Sigma_{jk}=(\sigma_{jk})$. Since we are considering here covariables, it is a bit more complicated, and we note $\mathcal{PLN}_X(\mu,\Sigma)$ the Poisson-log-normale distribution given the vector of covariables $X$ and $p_(\mu, \Sigma \mid X)$ its density function.
+
+\begin{theorem} \label{Consistence_2}
+For each $(j,k) \in \{1...n\}^2$, $j \neq k$, the estimator $(\widehat{\mu}^{jk}_n,\widehat{\Sigma}^{jk}_n)$ constructed by maximizing the log-likelihood of the couple $(Y^i_j,Y^i_k)_{i \in \{1...n\}}$, given by $\sum_{i=1}^{n} \mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y^i_j,Y^i_k))$, is a consistent estimator of the correlation coefficient $\mu_{jk}$ and of the vector of variance-covariance $\Sigma_{jk}$.
+\end{theorem}
+
+\begin{proof}
+
+The idea of this proof is to use the theorem \ref{ThMest} for our composite likelihood. The proof will  follow four steps to verify that the assumptions of the theorem are verified. We will first show the convergence in probability of our M-estimator to a function $\mathrm{M}_{(\mu_{jk},\Sigma_{jk})}$ then the existence of a unique maximum for this function $\mathrm{M}_{(\mu_{jk},\Sigma_{jk})}$. To do this we need to steps : at first we show that our model is identifiable and then, using the Kullback-divergence, that it has a maximum. Combinig this two steps will allow us to conclude the existence of a unique maximum. In the last part, we conclude, using the theroem \ref{ThMest} on the consistence of the estimator. \\
+\\
+\textbf{Step 1 :} Convergence in probability.\\
+Using the large number low, we do have that $\frac{1}{n} \sum_{i=1}^{n} \mathrm{log}(p_{(\mu,\Sigma \mid X)}(Y^i_j,Y^i_k))$ converge almost surely and so in probability to $\mathbb{E}_X[\mathbb{E}_{Y \mid X}[ \mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]]$.\\
+\\
+\textbf{Step 2 :} Identifiability of the model.\\
+ We use the general definition of identifiability \cite{rivoirard}, namely that the family of probabilities $\mathcal{P}=\{\mathbb{P}_\theta,\theta \in \Theta\}$ is identifiable if the application $ \theta \mapsto \mathbb{P}_\theta$ is injective.
+ In our case $\mathcal{P}=\{(\mathcal{PLN}_X (\mu,\Sigma))_{X _in \mathcal{X}}; (\mu, \Sigma) \in  \mathcal{M}_{p\times n}(\mathbb{R}) \times \mathcal{M}_n(\mathbb{R})\}$. To show the identifiability of the model we will use the fact that two variables having the same distribution have the same moment. Consider $(\mu_{jk},\Sigma_{jk}) \in \mathcal{M}_{p\times 2}(\mathbb{R}) \times \mathcal{M}_2(\mathbb{R})$ and $(\mu'_{jk},\Sigma'_{jk}) \in \mathcal{M}_{p\times 2}(\mathbb{R}) \times \mathcal{M}_2(\mathbb{R})$, so that  for every vector of covariables $X \in \mathcal{X}$,$\mathcal{PLN}_X(\mu_{jk},\Sigma_{jk})\sim\mathcal{PLN}_X(\mu'_{jk},\Sigma'_{jk})$ . We have :
+ \begin{equation}
+ \mathbb{E}_{(\mu_{jk},\Sigma_{jk} \mid X)}[Y_j]=\mathbb{E}_{(\mu'_{jk},\Sigma'_{jk} \mid X)} [Y_j] 
+ \end{equation}
+\begin{equation}
+ \mathrm{Var}_{(\mu_{jk},\Sigma_{jk} \mid X)}[Y_j]=\mathrm{Var}_{(\mu'_{jk},\Sigma'_{jk} \mid X)} [Y_j] \\
+\end{equation}
+\begin{equation}
+ \mathrm{Cov}_{(\mu_{jk},\Sigma_{jk} \mid X)}[Y_j,Y_k]=\mathrm{Cov}_{(\mu'_{jk},\Sigma'_{jk} \mid X)} [Y_j,Y_jk]
+\end{equation}
+Using the formula of this moment we recall in the introduction, we find that $\sigma_{jj} = \sigma'_{jj}$, $\sigma_{jk}=\sigma'_{jk}$ and $X (\mu_j-\mu'_j)=0$. The last condition has to be true for any vector of covariable $X$. We deduce from this that,  we expect $\mathcal{X}^\perp = \{0\}$ for the model to be identifable, \textit{ie.} that $\mathrm{rg}(\mathcal{X})=p$.\\
+\\
+\textbf{Step 3 :} Existence of a unique maximum for the $\mathrm{M}(\mu_{jk},\Sigma_{jk})$-function.\\
+What we consider is nothing else than the log-likelihood of two variables with a Poisson-log-normale distribution. We just shew that the model is identifiable. So there exist one and only one set of parameters $(\mu_{jk}^\ast, \Sigma_{jk}^\ast)$ such that $(Y_j,Y_k) \sim \mathcal{PLN}_X(\mu_{jk}^\ast,\Sigma_{jk}^\ast)$. We first can show that maximizing the log-likelihood is equivalent to minimize the Kullback divergence. We recall that the Kullback divergence for top distribution of density functions $p_\theta$ a,d $p_{\theta^\ast}$ is given by $\mathrm{D_{KL}}(p_{\theta^\ast} \parallel p_{\theta})= \int p_{\theta^\ast}(x) \mathrm{log}(\frac{p_{\theta^\ast}(x)}{p_{\theta}(x)}) \mathrm{d}x$. Since we have $\mathbb{E}_X[\mathbb{E}_{(\mu^\ast,\Sigma^\ast \mid X)}[\mathrm{log}(p_{(\mu_{jk}^\ast,\Sigma_{jk}^\ast \mid X)}(Y_j,Y_k)) - \mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]] = \mathbb{E}_X[\mathrm{D_{KL}}(p_{(\mu_{jk}^\ast,\Sigma_{jk}^\ast \mid X)}\parallel p_{(\mu_{jk},\Sigma_{jk} \mid X)})]$. Since the Kullback-divergence is always positive, we see that maximizing the log-likelihood is equivalent to minimize the Kullback-divergence. The Kullback-divergence is only zero if the two distributions are the same. So we see that the M function is maximum for $(\mu_{jk},\Sigma_{jk})=(\mu_{jk}^\ast,\Sigma_{jk}^\ast)$. So we can conclude that the function M only has one maximum, and this maximum is obtained for the parameters we are interested in.\\
+\\
+\textbf{Step 4 :} Conclusion.\\
+To summurize we have :
+\begin{enumerate}
+\item For any set of parameters $(\mu_{jk},\Sigma_{jk})$,\\
+ $\mid \frac{1}{n} \sum_{i=1}^{n} \mathrm{log}(p_{(\mu,\Sigma \mid X)}(Y^i_j,Y^i_k)) - \mathbb{E}_X[\mathbb{E}_{Y\mid X}[\mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]] \mid \overset{\mathbb{P}}{\longrightarrow} 0 $ 
+\item The function $(\mu_{jk},\Sigma_{jk})\mapsto \mathbb{E}_X[\mathbb{E}_{Y\mid X}[\mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]] $ only has one maximum for $(\mu_{jk},\Sigma_{jk})=(\mu^\ast_{jk},\Sigma^\ast_{jk})$, the parameters of the Poisson-log-Normale distribution of the variables $(Y_i,Y_j)$.
+\end{enumerate}
+Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{\mu}^{jk}_n, \Sigma^{jk}_n)_{n \in \mathbb{N}}$ converges in probability to what we hope to approximate, namely $(\mu^\ast_{jk}, \Sigma^\ast_{jk}$).
+\end{proof}
+
+\subsubsection{Generalization to the composite likelihood.}
+What we wnat to show is the consistence of the estimators obtained by maximizing the composite likelihood. We recall that the composite likelihood is given by : $\mathcal{CL}_{(\mu,\Sigma) \mid X}(Y^i)=\sum_{i=1}^{n} \sum_{j<k} log(p_{(\mu_{jk},\Sigma_{jk} \mid X)} (Y^i_j,Y^i_k)$.\\
+\begin{theorem}
+The estimator $(\widehat{\mu}_n,\widehat{\Sigma}_n)$ constructed by maximizing the composite likelihood for $(Y_i)_{i \in \{1...n\}}$ is a consistent estimator of the correlation coefficients $\mu$ and of the vector of variance-covariance $\Sigma$.
+\end{theorem}
+
+\begin{proof}
+The proof follows exactly the same path that we did for a couple of variables. We will again use theorem \ref{ThMest} and the results of theorem \ref{Consistence_2}.\\
+\\
+\textbf{Step 1 :} Convergence in probability.
+Again using the large number law we have :\\
+ $\frac{1}{n}\sum_{i=1}^{n} \sum_{j<k} log(p_{(\mu_{jk},\Sigma_{jk} \mid X)} (Y^i_j,Y^i_k) \overset{\mathbb{P}}{\longrightarrow} \sum_{j<k}\mathbb{E}_X [\mathbb{E}_{Y \mid X}[\mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]]$.\\
+ We note M the function $\mathrm{M} : (\mu, \Sigma) \mapsto \sum_{j<k}\mathbb{E}_X [\mathbb{E}_{Y \mid X}[\mathrm{log}(p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))]]$.\\
+ \\
+ \textbf{Step 2 :} Identifiability of the model.\\
+The family of model we consider here is $\mathcal{P}=\{ (\mathcal{PLN}_X(\mu,\Sigma))_{X \in \mathcal{X}}; \mu \in \mathcal{M}_{pn}(\mathbb{R}), \Sigma \in \mathcal{M}_n(\mathbb{R})\}$. Using the moment as we did with a Poisson log-normale distribution of a vector of two variables, but this time for n variables is sufficient to show the identifiability of the model.\\
+\\
+\textbf{Step 3 :} Existence and uniqueness of the maximum for the function M.\\
+Again here we have by the identifiability of the model, under the assumption that the data follow a Poisson log-normale distribution, that there exist one and only one set of parameters $(\mu^\ast, \Sigma^\ast)$ such as given a vector of covariables $X$, $(Y^i) \sim \mathcal{PLN}_X (\mu^\ast, \Sigma^\ast)$. As we did in the previous section we show that maximizing M is equivalent to minimize the function :\\
+$(\mu, \Sigma) \mapsto \sum_{j<k} \mathbb{E}_X [\mathrm{D_{KL}}(p_{(\mu^\ast_{jk},\Sigma^\ast_{jk} \mid X)} \parallel p_{(\mu_{jk},\Sigma_{jk} \mid X)}]$.\\
+We have here a finite sum of positives variables, so in order to minimize it, we can minimize each of the terms. So the above function is minimal for $\mu^\ast=(\mu_j^\ast)_{j \in \{1...n\}}$ and $\Sigma^\ast$ defined as follow : the term $(\sigma_{jk})_{j \neq k}$ of $\Sigma^\ast$ is the term $\sigma_{12}$ of $\Sigma^\ast_{jk}$  and the term $\sigma_{jj}$ of $\Sigma^\ast$ is the term $\sigma_{11}$ of $\Sigma^\ast_{jk}$.\\
+Thus we have the existence of a maximum and its uniqueness.\\
+\\
+\textbf{Step 4 :} Conclusion.\\
+Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{\mu}_n, \widehat{\Sigma}_n)_{n \in \mathbb{N}}$ maximizing the composite likelihood function $(\mu,\Sigma) \mapsto \mathcal{CL}_{(\mu,\Sigma) \mid X}((Y^i)_{i \in \{1..n\}})$  converges in probability to what we hope to approximate, namely $(\mu^\ast, \Sigma^\ast)$, the parameters of our Poisson log-normale model.
+\end{proof}
+
+\section{Approximationg the estimators}
+We now know that the estimators we consider are consitent, so it now worth to calculate them. To do so, we will use numerical approximations and so we have to calculate their gradients. As we saw previously, in order to estimate the maximum of the compsite likelihood, it is sufficient to estimate the maximum of the log-likelihood for each couple of variables. In order to do this, we have to calculate the gradient of the esitimators. Given a couple $(j,k)$, we will calculate the derivative of it with respect to all the parameters.
+\subsection{With respect to the vector $\mu$.}
+Let consider $i \in \{1...n\}$. We want to calculate $\partial_{\mu_i}\mathrm{log}( p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))$.
+\begin{align*}
+\partial_{\mu_i}\mathrm{log}( p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k)) &= \frac{\partial_{\mu_i}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k) }{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k)}
+\end{align*}
+
+Since :
+\begin{align*}
+\partial_{\mu_i}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k) &= \mathbb{E}_{(Z_j,Z_k)}[\partial_{\mu_i}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k \mid Z_j,Z_k)]\\
+&= \mathbb{E}_{(Z_j,Z_k)}[\partial_{\mu_i}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j\mid Z_j)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_k\mid Z_k)]
+\end{align*}
+if $i \neq j$ and $i \neq k$, this partial derivatives is equal to 0.
+Otherwise, taking for example $i=j$, one have :
+\begin{align*}
+\partial_{\mu_j}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k) &= \mathbb{E}_{(Z_j,Z_k)}[\partial_{\mu_j}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j\mid Z_j)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_k\mid Z_k)]\\
+&= \mathbb{E}_{(Z_j,Z_k)}[X(Y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)} (Y_j \mid Z_j)-(Y_{j}+1) p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j+1\mid Z_j))p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_k\mid Z_k)]\\
+&= X(Y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k)-(Y_j+1)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j+1,Y_k))
+\end{align*}
+Where the second equality comes from the fact that $Y_j \mid Z_j$ is following a Poisson-distribution. We have :
+\begin{align*}
+\partial_{\mu_j} p_{\mu_j,\Sigma_{jj} \mid X}(Y_j \mid Z_j) &= \partial_{\mu_j} (\mathrm{e}^{Y_j (X \mu_j + Z_j)} \mathrm{exp}(-e^{X \mu_j + Z_j}) \frac{1}{Y_j !} )\\
+&= X Y_j\frac{\mathrm{e}^{Y_j (X \mu_j + Z_j)} \mathrm{exp}(-e^{X \mu_j + Z_j})}{Y_j !} - X \frac{\mathrm{e}^{(Y_j+1) (X \mu_j + Z_j)} \mathrm{exp}(-e^{X \mu_j + Z_j})}{Y_j !}\\
+&= X(Y_j p_{(\mu_{j},\Sigma_{jj} \mid X)} (Y_j \mid Z_j)-(Y_{j}+1) p_{(\mu_{j},\Sigma_{jj} \mid X)}(Y_j+1\mid Z_j))
+\end{align*}
+So we conclude that
+\begin{align*}
+\partial_{\mu_i}\mathrm{log}( p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k)) &= X(Y_j -(Y_j+1)\frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j+1,Y_k)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))})
+\end{align*}
+\subsection{With respect to the matrix of variance - covariance.}
+
+
+\bibliographystyle{plain}
+\bibliography{Biblio.bib}
+\end{document}
