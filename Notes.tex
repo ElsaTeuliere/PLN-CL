@@ -221,7 +221,7 @@ Thus we have the existence of a maximum and its uniqueness.\\
 Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{\mu}_n, \widehat{\Sigma}_n)_{n \in \mathbb{N}}$ maximizing the composite likelihood function $(\mu,\Sigma) \mapsto \mathcal{CL}_{(\mu,\Sigma) \mid X}((Y^i)_{i \in \{1..n\}})$  converges in probability to what we hope to approximate, namely $(\mu^\ast, \Sigma^\ast)$, the parameters of our Poisson log-normale model.
 \end{proof}
 
-\section{Approximationg the estimators}
+\section{Approximation of the estimators}
 We now know that the estimators we consider are consitent, so it now worth to calculate them. To do so, we will use numerical approximations and so we have to calculate their gradients. As we saw previously, in order to estimate the maximum of the compsite likelihood, it is sufficient to estimate the maximum of the log-likelihood for each couple of variables. In order to do this, we have to calculate the gradient of the esitimators. Given a couple $(j,k)$, we will calculate the derivative of it with respect to all the parameters.
 \subsection{With respect to the vector $\mu$.}
 Let consider $i \in \{1...n\}$. We want to calculate $\partial_{\mu_i}\mathrm{log}( p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))$.
@@ -252,8 +252,87 @@ So we conclude that
 \partial_{\mu_i}\mathrm{log}( p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k)) &= X(Y_j -(Y_j+1)\frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j+1,Y_k)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(Y_j,Y_k))})
 \end{align*}
 \subsection{With respect to the matrix of variance - covariance.}
+We note $\sigma_{i,j}$ the terms of the matrix of varianve covariance. The term of this matrix are only present in the density function of the multivariate normale distribution wth which the parameters of the Poissons are taken. In order to calcul the derivatives we will in both cases follow the same path :
+\begin{enumerate}
+\item We calculate the derivatives of the density function of the bivariate normale distribution wrt the parameter of interest. By integrating under the $\int$ we deduce the derivative of the Poisson-log-normale density function.
+\item We integrate by part to have a nice expression of this derivative.
+\end{enumerate}
+We recall here that the density function of the Poisson log-Normal distribution with mean $\mu$ and matrix of variance-covariance $\Sigma$, given a vector of covariables $X$ is given by :
+\begin{equation*}
+p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)=\int_{\mathbb{R}^2} p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k) h_{(0,\Sigma_{jk})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
+\end{equation*}
+With $h_{(0,\Sigma_{jk})}$ the density function of the bivariate normale distribution of mean $0$ and variance-covariance $\Sigma_{jk}$ and $p_{\beta}$ the density function of a Poisson distribution with parameters $\beta$.
+We finally recall that : $h_{(0,\Sigma_{jk})}(z_1,z_2)=\frac{1}{2 \pi \sqrt{\mid \sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}\mid} \mathrm{e}^{-\frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 -2 \sigma_{jk} z_1 z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}}$.
 
+\subsubsection{wrt $\sigma_{jj}$ and $\sigma_{kk}$}
+\begin{align*}
+\partial_{\sigma_{jj}} h_{(0,\Sigma_{jk})} (z_1,z_2) &= \frac{1}{2} [ \frac{-\sigma_{kk}}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} +  \frac{(\sigma_{jk} z_1 - \sigma_{kk} z_2)^2}{(\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2)^2}  ]h_{(0,\Sigma_{jk})}(z_1,z_2)
+\end{align*}
 
+Since the bivariate normale distribution admit second order moments, we can apply  the thoerem of derivation under $\int$ and deduce that :
+\begin{align*}
+\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &=\int_{\mathbb{R}^2} p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k)\frac{1}{2} [ \frac{-\sigma_{kk}}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} +  \frac{(\sigma_{jk} z_1 - \sigma_{kk} z_2)^2}{(\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2)^2}  ] h_{(0,\Sigma_{jk})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
+\end{align*}
+
+\noindent We will now try to find a nicer expression of this derivative. One can remark that $\partial_{z_2} (-\frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 -2 \sigma_{jk} z_1 z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}) = \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}$.
+
+This gives the clue to integrate by part with respect to $z_2$. We then have :
+\begin{align*}
+\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) =& \int_{\mathbb{R}} [  p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) ]_{- \infty}^{+\infty} \mathrm{d}z_1\\
+ &- \int_{\mathbb{R}^2} y_k p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2\\
+ &- \int_{\mathbb{R}^2} (y_k+1) p_{e^{X\mu_{jk}+z_1}}(y_j)  p_{e^{X\mu_{jk}+z_2}}(y_k+1) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2
+\end{align*}
+The derivatives of the density function of the Poisson distribution is obtained as we did in the previous section.\\
+The first rht of this equality being null, we can again integrate by part wrt $z_2$ and we get :
+\begin{align*}
+\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_k^2 p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)\\
+& - ((y_k+1)^2 + y_k (y_k+1) ) p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1) \\
+& + (y_k+1)(y_k+2) p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+2)
+\end{align*} 
+We are calculating this gradients in order to approximate the composite log likelihood so we are in fact interested in $\partial_{\sigma_{jj}} \mathrm{log}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$, which we now can easily calculate.
+\begin{align*}
+\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_k^2 - ((y_k+1)^2 + y_k (y_k+1) ) \frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1) } {p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}\\
+& + (y_k+1)(y_k+2)\frac{ p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+2)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}
+\end{align*}
+Symetrically we have wrt $\sigma_{kk}$ :
+\begin{align*}
+\partial_{\sigma_{kk}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_j^2 - ((y_j+1)^2 + y_j (y_j+1) ) \frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+1,y_k) } {p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}\\
+& + (y_j+1)(y_j+2)\frac{ p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+2,y_k)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}
+\end{align*}
+
+\subsubsection{wrt $\sigma_{jk}$ :}
+\begin{align*}
+\partial_{\sigma_{jk}}h_{(0,\Sigma)}(z_1,z_2) &= [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma)}(z_1,z_2)
+\end{align*}
+Again we can apply the theorem of derivating under the $\int$. We deduce that :
+\begin{align*}
+&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) =
+\int_{\mathbb{R}^2} p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k)\\
+&[   \frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma_{jk})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
+\end{align*}
+
+One can note that :
+\begin{align*}
+\partial_{z_1} ( - \frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 - 2 \sigma_{jk} z_1 z_2 }{\sigma_{jj} \sigma_{kk}-  \sigma_{jk}^2} ) & \partial_{z_2} ( - \frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 - 2 \sigma_{jk} z_1 z_2 }{\sigma_{jj} \sigma_{kk}-  \sigma_{jk}^2} ) =\\
+&  \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}
+\end{align*}
+Which gives a clue that we could do again tow part integrations : one towards $z_1$ and one towards $z_2$. \\
+We will do a first integration by part with respect to $z_1$. We note that : $ \partial_{z_1} ( \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) = [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma)}(z_1,z_2)$. And taking the derivative of the poisson density with respect to its parameters allows us to conclude that :
+\begin{align*}
+&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) = \int_{\mathbb{R}} [ p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2)]_{- \infty}^{+ \infty} \mathrm{d}z_2\\
+& - \int_{\mathbb{R}^2} (y_j p_{e^{X\mu_{jk}+z_1}}(y_j)- (y_j+1) p_{e^{X\mu_{jk}+z_1}}(y_j+1)) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
+\end{align*}
+The first right-hand term of the equality being equal to zero, we have, integrating by part again but this time wrt $z_2$, we have :
+\begin{align*}
+&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) =\int_{\mathbb{R}^2} (y_j p_{e^{X\mu_{jk}+z_1}}(y_j)- (y_j+1) p_{e^{X\mu_{jk}+z_1}}(y_j+1))\\
+& (y_k p_{e^{X\mu_{jk}+z_2}}(y_k)-(y_k + 1) p_{e^{X\mu_{jk}+z_2}}(y_k+1))  h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
+\end{align*}
+What we can also write :
+\begin{align*}
+\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) = &y_k y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)-(y_k+1)y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1)\\
+& -(y_j+1)y_k p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)+ (y_k+1) (y_j+1)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+1,y_k+1))
+\end{align*}
+Again we are interested in $\partial_{\sigma_{jk}}\mathrm{log}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$ which we can now easily calculate by dividing the above quantity by $p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$.
 \bibliographystyle{plain}
 \bibliography{Biblio.bib}
 \end{document}
