@@ -1,0 +1,93 @@
+\section{Inference for $p = 2$} \label{sec:inferenceP2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{align*}
+ \log p_\theta(Y) 
+ & = \log\Esp_Z \left[ p_\beta(Y|Z) \right]
+ = \log \Esp_Z \left[ p_{\beta_1}(Y^1|Z^1) p_{\beta_2}(Y^2|Z^2) \right] \\
+ & = \sum_i \log \Esp_{Z_i} \left[ p_{\beta_1}(Y_i^1|Z_i^1) p_{\beta_2}(Y_i^2|Z_i^2) \right]
+\end{align*}
+where $Y_i = (Y_i^1, Y_i^2)$ and
+\begin{align*}
+ p_{\beta_j}(Y_i^j|Z_i^j) 
+ & = \exp\left(-\exp(x_i^\trans \beta_j + Z_i^j) + (x_i^\trans \beta_j) Y_i^j - \log(Y_i^j !)
+ \right) 
+\end{align*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Derivatives wrt $\beta$.}
+Using Appendix \ref{app:propPoisMixt},
+\begin{align*}
+  \partial_{\beta_1} p_\theta(Y) 
+  & = \sum_i \Esp_{Z_i} \left[ \partial_{\beta_1} p_{\beta_1}(Y_i^1|Z_i^1) p_{\beta_2}(Y_i^2|Z_i^2) \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ \left( Y_i^1 p_{\beta_1}(Y_i^1|Z_i^1) - (Y_i^1 +1)p_{\beta_1}(Y_i^1+1|Z_i^1) \right)  p_{\beta_2}(Y_i^2|Z_i^2) x_i \right] \\
+  & = \sum_i \left( Y_i^1 \Esp_{Z_i} \left[ p_{\beta_1}(Y_i^1|Z_i^1) p_{\beta_2}(Y_i^2|Z_i^2) \right] 
+  -(Y_i^1 +1) \Esp_{Z_i} \left[ p_{\beta_1}(Y_i^1+1|Z_i^1) p_{\beta_2}(Y_i^2|Z_i^2) \right] \right) x_i \\
+  & = \sum_i B_i^1 x_i
+\end{align*}
+where
+$$
+B_i^1 = Y_i^1 p_\theta(Y_i^1, Y_i^2) -(Y_i^1 +1)p_\theta(Y_i^1+1, Y_i^2)
+$$
+and $\partial_{\beta_1} \log p_\theta(Y) = \partial_{\beta_1} p_\theta(Y) / p_\theta(Y)$ so, denoting $B_i^\intercal = [B_i^1 \; B_i^2]$ and $\beta^\intercal := [\beta_1^\intercal \beta_2^\intercal]$,
+$$
+\partial_\beta \log p_\theta(Y_i) = B_i x_i / p(Y_i).
+$$
+
+\begin{align*}
+  \partial^2_{\beta_1, \beta_1} p_\theta(Y) 
+  & = \sum_i \Esp_{Z_i} \left[ \partial^2_{\beta_1, \beta_1} p_{\beta_1}(Y_i^1|Z_i^1) p_{\beta_2}(Y_i^2|Z_i^2) \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ \partial_{\beta_1} \left( Y_i^1 p_{\beta_1}(Y_i^1|Z_i^1) - (Y_i^1 +1)p_{\beta_1}(Y_i^1+1|Z_i^1) \right) p_{\beta_2}(Y_i^2|Z_i^2) x_i^\intercal \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ x_i \left( Y_i^1 \left( Y_i^1 p_{\beta_1}(Y_i^1|Z_i^1) - (Y_i^1 +1)p_{\beta_1}(Y_i^1+1|Z_i^1) \right) \right. \right. \\
+  & \qquad \left. \left. - (Y_i^1 +1) \left( (Y_i^1+1) p_{\beta_1}(Y_i^1+1|Z_i^1) - (Y_i^1 +2)p_{\beta_1}(Y_i^1+2|Z_i^1) \right) \right) p_{\beta_2}(Y_i^2|Z_i^2) x_i^\intercal \right] \\
+  & = \sum_i C_i^{11} x_i x_i^\intercal
+\end{align*}
+where 
+$$
+C_i^{11} = (Y_i^1)^2 p_\theta(Y_i^1, Y_i^2) - (2 Y_i^1+1) (Y_i^1+1) p_\theta(Y_i^1+1, Y_i^2) + (Y_i^1+1) (Y_i^1+2) p_\theta(Y_i^1+2, Y_i^2)
+$$
+and 
+\begin{align*}
+  \partial^2_{\beta_1, \beta_2}p_\theta(Y) 
+  & = \sum_i \Esp_{Z_i} \left[ \partial_{\beta_1} p_{\beta_1}(Y_i^1|Z_i^1) \partial_{\beta_2} p_{\beta_2}(Y_i^2|Z_i^2) \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ 
+  x_i \left( Y_i^1 p_{\beta_1}(Y_i^1|Z_i^1) - (Y_i^1 +1)p_{\beta_1}(Y_i^1+1|Z_i^1) \right) \right. \\
+  & \qquad \left. \left( Y_i^2 p_{\beta_2}(Y_i^2|Z_i^2) - (Y_i^2 +1)p_{\beta_2}(Y_i^2+1|Z_i^2) \right) x_i ^\intercal \right] \\
+%   & = \sum_i \left(Y_i^1 Y_i^2 p_\theta(Y_i^1, Y_i^2) - Y_i^1 (Y_i^2+1) p_\theta(Y_i^1, Y_i^2+1) \right. \\
+%   & \qquad - \left (Y_i^1+1)Y_i^2 p_\theta(Y_i^1+1, Y_i^2) + (Y_i^1+1)(Y_i^2+1) p_\theta(Y_i^1+1, Y_i^2+1) \right) x_i x_i^\intercal \\
+  & = \sum_i C_i^{12}  x_i x_i^\intercal.
+\end{align*}
+where
+\begin{align*}
+ C_i^{12} 
+ & = Y_i^1 Y_i^2 p_\theta(Y_i^1, Y_i^2) - (Y_i^1+1) Y_i^2 p_\theta(Y_i^1+1, Y_i^2) \\
+ & \quad - Y_i^1 (Y_i^2+1) p_\theta(Y_i^1, Y_i^2+1) + (Y_i^1+1) (Y_i^2+1) p_\theta(Y_i^1+1, Y_i^2+1).
+\end{align*}
+
+So the $dp \times dp$ Jacobian matrix writes
+$$
+\partial^2_{\beta, \beta} p_\theta(Y) = \sum_i C_i \otimes x_i x_i^\intercal, 
+\qquad \text{where }
+C_i = \left[ \begin{array}{cc} C_i^{11} & C_i^{12} \\ C_i^{12} & C_i^{22} \end{array} \right]
+$$
+and, because,
+$$
+\partial^2_{\beta, \beta} \log p_\theta(Y_i) 
+= \frac{\partial^2_{\beta, \beta} p_\theta(Y_i)}{p_\theta(Y_i)} - \left(\partial_{\beta} \log p_\theta(Y_i)\right) \left(\partial_{\beta} \log p_\theta(Y_i)\right)^\intercal
+= \frac{\partial^2_{\beta, \beta} p_\theta(Y_i)}{p_\theta(Y_i)} - \left(\frac{\partial_{\beta}p_\theta(Y_i)}{p_\theta(Y_i)}\right) \left(\frac{\partial_{\beta}p_\theta(Y_i)}{p_\theta(Y_i)}\right)^\intercal
+.
+$$
+we get
+$$
+\partial^2_{\beta, \beta} \log p_\theta(Y_i) 
+= \sum_i \left( \frac{C_i}{p_\theta(Y_i)} - \frac{B_i B_i^\intercal}{p_\theta^2(Y_i)} \right) \otimes x_i x_i^\intercal, 
+$$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

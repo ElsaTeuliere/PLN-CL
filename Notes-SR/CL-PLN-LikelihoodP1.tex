@@ -1,0 +1,55 @@
+\section{Inference for $p = 1$}  \label{sec:inferenceP1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{align*}
+ \log p_\theta(Y) 
+ & = \log\Esp_Z \left[ p_\beta(Y|Z) \right]
+ = \log \Esp_Z \left[ p_{\beta}(Y|Z)\right] \\
+ & = \sum_i \log \Esp_{Z_i} \left[ p_{\beta}(Y_i|Z_i) \right]
+\end{align*}
+where 
+\begin{align*}
+ p_{\beta_j}(Y_i^j|Z_i^j) 
+ & = \exp\left(-\exp(x_i^\trans \beta_j + Z_i^j) + (x_i^\trans \beta_j) Y_i^j - \log(Y_i^j !)
+ \right) 
+\end{align*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Derivatives wrt $\beta$.}
+Using Appendix \ref{app:propPoisMixt},
+\begin{align*}
+  \partial_{\beta} p_\theta(Y) 
+  & = \sum_i \Esp_{Z_i} \left[ \partial_{\beta} p_{\beta}(Y_i|Z_i) \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ \left( Y_i p_{\beta}(Y_i|Z_i) - (Y_i +1)p_{\beta}(Y_i+1|Z_i) \right) x_i \right] \\
+  & = \sum_i \left( Y_i \Esp_{Z_i} \left[ p_{\beta}(Y_i|Z_i) \right] 
+  -(Y_i +1) \Esp_{Z_i} \left[ p_{\beta}(Y_i+1|Z_i) \right] \right) x_i \\
+  & = \sum_i \left(Y_i p_\theta(Y_i) -(Y_i +1)p_\theta(Y_i+1)\right) x_i,
+\end{align*}
+and $\partial_{\beta} \log p_\theta(Y_i) = \partial_{\beta} p_\theta(Y_i) / p_\theta(Y_i) $; 
+\begin{align*}
+  \partial^2_{\beta, \beta} p_\theta(Y) 
+  & = \sum_i \Esp_{Z_i} \left[ \partial^2_{\beta, \beta} p_{\beta}(Y_i|Z_i) \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ \partial_{\beta} \left( Y_i p_{\beta}(Y_i|Z_i) - (Y_i +1)p_{\beta}(Y_i+1|Z_i) \right) x_i^\intercal \right] \\
+  & = \sum_i \Esp_{Z_i} \left[ x_i \left( Y_i \left( Y_i p_{\beta}(Y_i|Z_i) - (Y_i +1)p_{\beta}(Y_i+1|Z_i) \right) \right. \right. \\
+  & \qquad \left. \left. - (Y_i +1) \left( (Y_i+1) p_{\beta}(Y_i+1|Z_i) - (Y_i +2)p_{\beta}(Y_i+2|Z_i) \right) \right) x_i^\intercal \right] \\
+  & = \sum_i \left((Y_i)^2 p_\theta(Y_i) - (2 Y_i+1) (Y_i+1) p_\theta(Y_i+1) + (Y_i+1) (Y_i+2) p_\theta(Y_i+2) \right) x_i x_i^\intercal
+\end{align*}
+and
+$$
+\partial^2_{\beta, \beta} \log p_\theta(Y_i) 
+= \frac{\partial^2_{\beta, \beta} p_\theta(Y)}{p_\theta(Y)} - \left(\frac{\partial_{\beta}p_\theta(Y_i)}{p_\theta(Y_i)}\right) \left(\frac{\partial_{\beta}p_\theta(Y_i)}{p_\theta(Y_i)}\right)^\intercal
+= \frac{\partial^2_{\beta, \beta} p_\theta(Y)}{p_\theta(Y)} - \left(\partial_{\beta} \log p_\theta(Y_i)\right) \left(\partial_{\beta} \log p_\theta(Y_i)\right)^\intercal.
+$$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Derivatives wrt $\Omega = \sigma^{-2}$.} See \cite{Izs08}:
+$$
+\partial_{\sigma^{-2}} p_\theta(Y) 
+= \frac12 \left(Y^2 p_\theta(Y) - (Y+1)(2Y+1) p_\theta(Y+1) + (Y+1)(Y+2) p_\theta(Y+2) \right)
+$$

@@ -1,0 +1,57 @@
+\documentclass[a4paper, 11pt]{article}
+
+% Mise en page
+\textwidth 16cm
+\textheight 24cm 
+\topmargin -1 cm 
+\oddsidemargin 0cm 
+\evensidemargin 0cm
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathabx}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{natbib}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\newtheorem{lemma}{Lemma}
+
+\input{Commands}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Composite likelihood for Poisson log-normal model}
+
+\author{SR} 
+
+\date{\today}
+\maketitle
+
+\input{CL-PLN-Model}
+
+\input{CL-PLN-LikelihoodP1}
+
+\input{CL-PLN-LikelihoodP2}
+
+\input{CL-PLN-InferenceP3}
+
+\appendix
+\section{Appendix}
+\input{CL-PLN-Appendix}
+
+\bibliography{PLN}
+\bibliographystyle{plain}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+

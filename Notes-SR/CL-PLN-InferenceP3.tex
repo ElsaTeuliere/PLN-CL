@@ -1,0 +1,68 @@
+\section{Inference for $p > 2$}  \label{sec:inferenceP3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood \& composite likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{align*}
+ \ell(Y; \theta) & = \log p_\theta(Y) = \sum_i \log p_\theta(Y_i) 
+ = \sum_i \log \int p_\beta(Y_i|Z_i) p_\Sigma(Z_i) \d Z_i
+\end{align*}
+Big integral to compute when $p$ is large.
+
+\begin{align*}
+ \cl(Y; \theta) 
+ & = \sum_{j<k} \log p_\theta(Y^{j, k}) = \sum_{j<k} \sum_i \log p_\theta(Y_i^{j, k}) \\
+ & = \sum_{j<k} \sum_i \log \int p_\beta(Y_i^{j, k}|Z_i^{j, k}) p_{\Sigma_{[j, k]}}(Z_i^{j, k}) \d Z_i^{j, k} 
+\end{align*}
+Only a 2d-integrals to compute, doable using \cite{GrE08}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Derivatives wrt $\beta$.}
+\begin{align*}
+ \partial_{\beta_j} \cl(Y; \theta) 
+ & = \sum_{k \neq j} \sum_i \partial_{\beta_j} \log p_\theta(Y_i^{j, k}) \\
+ \partial_{\beta_j, \beta_k} \cl(Y; \theta) 
+ & = \sum_i \partial_{\beta_j, \beta_k} \log p_\theta(Y_i^{j, k})
+ & \text{for } j \neq k \\
+ \partial_{\beta_j, \beta_j} \cl(Y; \theta) 
+ & = \sum_{k \neq j} \sum_i \partial_{\beta_j, \beta_j} \log p_\theta(Y_i^{j, k})
+\end{align*}
+where $\partial_{\beta_j} \log p_\theta(Y_i^{j, k})$, $\partial_{\beta_j, \beta_k} \log p_\theta(Y_i^{j, k})$ and $\partial_{\beta_j, \beta_j} \log p_\theta(Y_i^{j, k})$ are given in Section \ref{sec:inferenceP2}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Following \cite{VRF11}, the asymptotic variance of $\widehat{\theta}$ is $[n G(\theta)]^{-1}$
+where $G(\theta)$ stands for the Godambe matrix 
+$$
+G(\theta) = H(\theta) J(\theta)^{-1} H(\theta)
+$$
+and
+$$
+J(\theta) = \Var_\theta[\partial_\theta \cl(Y; \theta)], 
+\qquad
+H(\theta) = -\Esp_\theta[\partial^2_{\theta, \theta} \cl(Y; \theta)].
+$$
+Estimates of $J(\theta)$ and $H(\theta)$ can be obtained through their empirical versions
+\begin{align*}
+ \widehat{J}(\theta) 
+ & = \frac1n \sum_i \left[\partial_\theta \cl(Y_i, \widehat{\theta})\right] \left[\partial_\theta \cl(Y_i, \widehat{\theta})\right]^\intercal 
+ = \frac1n \sum_i \left[\sum_{j, k} \partial_\theta \log p_{\widehat{\theta}}(Y_i^{j, k})\right] \left[\sum_{j, k} \partial_\theta \log p_{\widehat{\theta}}(Y_i^{j, k})\right]^\intercal
+\end{align*}
+as $\partial_\theta \cl(Y_i, \widehat{\theta})$ is zero and
+\begin{align*}
+ \widehat{H}(\theta) 
+ & = \frac1n \sum_i \partial^2_{\theta, \theta} \cl(Y_i, \widehat{\theta})
+ = \frac1n \sum_{i, j, k} \partial^2_{\theta, \theta} \log p_{\widehat{\theta}}(Y_i^{j, k}).
+\end{align*}
+So the asymptotic variance matrix can be estimated as
+$\widehat{\Var}(\widehat{\theta}) = n^{-1} \widehat{H}(\theta)^{-1} \widehat{J}(\theta) \widehat{H}(\theta)^{-1}$.
+
+
+

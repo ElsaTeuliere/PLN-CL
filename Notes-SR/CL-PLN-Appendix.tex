@@ -1,0 +1,104 @@
+\subsection{(Infinite) Poisson mixture} \label{app:propPoisMixt}
+
+For any distribution $F$, not only Gaussian, consider
+\begin{equation} \label{eq:PoisMixt}
+Z \sim F; \qquad Y\;|\;Z \sim \Pcal(e^{\mu + Z}).
+\end{equation}
+We have
+$$
+p(Y) = \Esp_Z \left[ p(Y|Z) \right] = \Esp_Z \left[ e^{-\exp(\mu +Z)} e^{Y(\mu+Z)} / Y! \right] 
+$$
+
+\paragraph{Derivatives of $p(Y)$.}
+We have
+\begin{align*}
+ \partial_\mu p(Y) 
+ & = \Esp_Z \left[ \partial_\mu p(Y|Z) \right] 
+ = \Esp_Z \left[ \left(Y -e^{\mu +Z}\right) p(Y|Z) \right] \\
+ & = Y \Esp_Z \left[ p(Y|Z) \right] - \Esp_Z \left[ (Y+1) e^{-\exp(\mu +Z)} e^{(Y+1)(\mu+Z)} / (Y+1)! \right] \\
+ & = Y p(Y) - (Y+1) p(Y+1)
+\end{align*}
+and, consequently, 
+\begin{align*}
+ \partial^2_{\mu^2} p(Y) 
+ & = Y \partial_\mu p(Y) - (Y+1) \partial_\mu p(Y+1) \\
+ & = Y \left[ Y p(Y) - (Y+1) p(Y+1) \right]  - (Y+1) \left[ (Y+1) p(Y+1) - (Y+2) p(Y+2) \right] \\
+ & = Y^2 p(Y) - (Y+1) (2Y+1) p(Y+1) + (Y+1) (Y+2) p(Y+2) 
+\end{align*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{1D PLN} \label{app:1dPLN}
+
+Taking $F = \Ncal(0, \sigma^2)$ in \eqref{eq:PoisMixt}, we have
+$$
+\partial_{\sigma^{-2}} p(Z) 
+= p(Z) \partial_{\sigma^{-2}} \log p(Z) 
+= p(Z) \left(\sigma^2 - Z^2\right)/2
+$$
+so
+$$
+\partial_{\sigma^{-2}} p(Y) 
+= \int p(Z) p(Y|Z) \left(\sigma^2 - Z^2\right) / 2 \d Z 
+= \left(\sigma^2 p(Y) - \Esp_Z \left[ Z^2 p(Y|Z) \right] \right) / 2 
+$$
+All derivatives can be found in \cite{Izs08}, originally in \cite{Sha88}. 
+\begin{itemize}
+ \item The derivatives wrt $\mu$ follow from Section \eqref{app:propPoisMixt}. 
+ \item The first order derivative wrt $\sigma^{2}$ (actually, likely wrt $\sigma^{-2}$) is  function of $p(Y)$, $p(Y+1)$ and $p(Y+2)$.
+ \item The cross derivative wrt $\mu$ and $\sigma^{-2}$ is function of $p(Y), \dots, p(Y+3)$.
+ \item The second order derivative wrt $\sigma^{-2}$ is function of $p(Y), \dots, p(Y+4)$.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate normal} \label{app:multinorm}
+
+Let $\phi(Z, \Omega^{-1})$ denote the density of the Gaussian distribution with precision matrix $\Omega$.
+
+\paragraph{Derivatives wrt $\Omega$.}
+Using section 2.8.2 from \cite{PeP12}, we have
+\begin{align*}
+  \partial_\Omega \log \phi(Z, \Omega^{-1}) 
+  & = \Omega^{-1} - Z Z^\intercal - \frac12 \Diag\left(\Omega^{-1} - Z Z^\intercal \right).
+\end{align*}
+More specifically, let us define the $\uptri$ operator, which transform any $p \times p$ symmetric matrix into a $p(p+1)/2$ vector made of its upper diagonal part:
+$$
+\begin{aligned} 
+  \uptri: & \; \mathcal{S}_{p, p} & \mapsto & \; \Rbb^{p(p-1)/2} \\
+ & \; A = [a_{i, j}]_{1 \leq i, j \leq p}
+ & \rightarrow 
+ & \; [a_{1,1} \; \dots \; a_{1,p} \; a_{2,2} \; \dots \; a_{2,p} \; \dots \; a_{p-1, p-1} \; a_{p, p-1} \;  a_{p,..p}]^\intercal.
+\end{aligned}
+$$
+We get
+\begin{align*}
+  \partial_{\uptri(\Omega)} \log \phi(Z, \Omega^{-1}) 
+  & = \uptri\left(\Omega^{-1}\right) - \uptri(Z Z^\intercal) - \frac12 \diag\left(\Omega^{-1} - Z Z^\intercal \right)
+\end{align*}
+% and, because $\uptri(\Diag(A)) = \diag(A)$, 
+% \begin{align*}
+%   \partial^2_{\uptri(\Omega), \uptri(\Omega)} \log \phi(Z, \Omega^{-1}) 
+%   & = \uptri\left(\Omega^{-2}\right) - \frac12 \diag\left(\Omega^{-1}\right).
+% \end{align*}
+As for the derivatives of the density itself, we get
+\begin{align*}
+  \partial_{\uptri(\Omega)} \phi(Z, \Omega^{-1}) 
+  & = \phi(Z, \Omega^{-1}) \left[\uptri\left(\Omega^{-1}\right) - \uptri(Z Z^\intercal) - \frac12 \diag\left(\Omega^{-1} - Z Z^\intercal \right) \right] \\
+%   \partial^2_{\uptri(\Omega), \uptri(\Omega)} \phi(Z, \Omega^{-1}) 
+%   & = \phi(Z, \Omega^{-1}) \left[\partial^2_{\uptri(\Omega), \uptri(\Omega)} \log \phi(Z, \Omega^{-1}) - \left(\partial_{\uptri(\Omega)} \log \phi(Z, \Omega^{-1})\right) \left(\partial_{\uptri(\Omega)} \log \phi(Z, \Omega^{-1})\right)^\intercal \right] \\
+\end{align*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evaluation of composite likelihood pdf}
+
+\paragraph{R package {\tt poilog}: }
+\url{https://CRAN.R-project.org/package=poilog}
+
+\paragraph{Composite-likelihood: }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evaluation of 2D Poisson log-normal pdf}
+
+\paragraph{R package {\tt poilog}: }
+\url{https://CRAN.R-project.org/package=poilog}
+

@@ -1,0 +1,23 @@
+\section{Model}
+
+\paragraph{Motivation.} No generic easy-to-handle model \cite{IYA17}.
+
+\begin{align*}
+ (Z_i)_i \text{ iid}, & \quad Z_i \sim \Ncal_p(0, \Sigma) & \Omega = \Sigma^{-1}, \\
+ (Y_i^j)_{i, j} \text{ indep. } | Z, & \quad Y_i^j \sim \Pcal\left(\exp(x_i^\trans \beta_j + Z_i^j)\right) 
+\end{align*}
+Let $\theta = (\Sigma, \beta)$.
+
+\paragraph{Some properties.} 
+Obviously,
+\begin{align*}
+ p(Y) 
+ & = \iiint p(Y | Z) p(Z) \d Z  = \Esp_Z \left[\prod_j p(Y^j | Z^j) \right] \\
+ p(Y^{j, k}) 
+%  & = \iiint p(Y) \prod_{m \neq j, k} \d Y^m
+%  = \iiint \iiint p(Z) \prod_m p(Y^m|Z^m) \prod_{m \neq j, k} \d Y^m \prod_m \d Z^m \\
+%  & = \iiint \iiint p(Z) \prod_m p(Y^m|Z^m) \prod_{m \neq j, k} \d Y^m \prod_m \d Z^m \\
+%  & = \iiint p(Z) p(Y^j|Z^j) p(Y^k|Z^k) \left(\prod_{m \neq j, k} \int p(Y^m|Z^m) \d Y^m\right) \prod_m \d Z^m \\
+%  & = \iint p(Z^{j, k}) p(Y^j|Z^j) p(Y^k|Z^k) \left(\int p(Z^{-j, -k}| Z^{j, k} \prod_{m \neq j, k} \d Z^m\right) \d Z^j \d Z^m \\
+ & = \Esp_{Z^{j, k}} \left[ p(Y^j|Z^j) p(Y^k|Z^k) \right]
+\end{align*}
