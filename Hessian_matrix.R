@@ -3,7 +3,7 @@
 ###############################################################################
 #Calcul de la matrice pour une observation :
 
-Hessian<-function(param,Yi,X,O,d,p){ #Ici on rentre les paramètres d et p pour éviter ensuite dans la boucle sur les observations d'avoir à les recalculer
+Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramètres d et p pour éviter ensuite dans la boucle sur les observations d'avoir à les recalculer
   #mise en forme des paramètre 
   Mu=matrix(param[1:(p*d)],d,p)
   Sigma=param[(p*d+1):(p*d+p)]
@@ -13,9 +13,9 @@ Hessian<-function(param,Yi,X,O,d,p){ #Ici on rentre les paramètres d et p pour 
   Xmu=O+X%*%Mu
   
   #On commence par calculer tous les termes dont on aura besoin 
-  terms<-matrix(4*p,4*p)
+  terms<-matrix(0,4*p,4*p)
   for(j in 2:p){
-    for (k in 1:(j-1){
+    for (k in 1:(j-1)){
       for (l in 1:5){
         for (m in 1:5){
           if (l+m<6){
@@ -25,8 +25,56 @@ Hessian<-function(param,Yi,X,O,d,p){ #Ici on rentre les paramètres d et p pour 
       }
     }
   }
-#Maintenant on rempli la matrice hessienne
-#On commence par le bloc des ddérivées par rapport aux termes de moyenne
+  terms<-terms+t(terms)
   
+#Maintenant on rempli la matrice hessienne
+hess_mat<-matrix(0,d*p+0.5*p*(p-1),d*p+0.5*p*(p-1))
+#On commence par le bloc des ddérivées par rapport aux termes de moyenne
+  #Les dérivées non croisées
+  for (j in 1:p){ #on parcourt tous les paramètres mu
+    bloc<-0
+    for (k in 1:p){#puis tous les couples ou j intervient
+      if (j != k){
+        bloc<-bloc+ X%*%t(X) *(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*((Y[j]+1)*(Y[j]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+3,5*(k-1)+1]-(Y[j]+1)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+2,5*(k-1)+1]-(Y[j]+1)^2 * terms[5*(j-1)+2,5*(k-1)+1]^2)
+      }
+    }
+   hess_mat[(d*(j-1)+1):(d*j),(d*(j-1)+1):(d*j)] <- bloc
+  }
+  #Les termes de dérivée croisée
+  for (j in 1:(p-1)){
+    for (k in (j+1):p){
+      hess_mat[(d*(j-1)+1):(d*j),(d*(k-1)+1):(d*k)]<- X%*%t(X) * (Y[j]+1)*(Y[k]+1)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+2,5*(k-1)+2]-terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2])
+    }
+  }
+    #On s'attaque maintenant au bloc des dérivées par rapport aux termes de variance
+    #Tout d'abord les dérivées non croisées
+    for (j in 1:p){
+      for(k in 1:p){
+        if (j != k){
+          hess_mat[d*p+j,d*p+j]<-hess_mat[d*p+j,d*p+j]+(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[k]+1)*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+(2*Y[k]^2+9*Y[k]+7)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-(4*Y[k]^2+16*Y[k]+13)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+4]+(Y[k]+1)^2*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(Y[k]+4)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+5]-(Y[k]+1)^2*(Y[k]+2)^2*terms[5*(j-1)+1,5*(k-1)+3]^2)
+        }
+      }
+    }
+  #Maintenant les termes de dérivée croisée avec les termes de moyenne
+  #On commence par les dérivées mu_j sigma_jj
+for(j in 1:p){
+  vect=0
+  for (k in 1:p){
+    if(j !=k){
+      vect<- vect + (Y[j]+1)*(Y[k]+2)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*((2*Y[k]+1)*(terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+2,5*(k-1)+2]-terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))
+    }
+  }
+  hess_mat[((j-1)*d+1):(j*d), d*p+j]<-X*vect
+}
+#On calcule maintenant les termes mu_j sigma_kk ou k et j diffèrent
+for (j in 1:p){#indice du sigma par rapport auquel on dérive
+  for (k in 1:p){#indice du mu par rapport auquel on dérive
+    if (k != j){
+      hess_mat[((k-1)*d+1):(k*d),d*p+j]<- X * ((Y[k]+1)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(2*Y[k]+1) *terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*((2*Y[k]+3)* terms[5*(j-1)+1,5*(k-1)+3]-(Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+4])+(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]*((Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]-(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2])))
+    }
+  }
+}
+#Reste maintenant les dérivées par rapport aux termes de covariance
 
+return(hess_mat)
 }

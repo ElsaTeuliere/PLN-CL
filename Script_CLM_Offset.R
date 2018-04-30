@@ -4,6 +4,18 @@ library(MASS)
 library(PLNmodels)
 library(poilog)
 library(nloptr)
+library(reshape2)
+library(ggplot2)
+
+##################################################################################################
+#Notation
+
+#On note Y la matrice des observations. Y est une matrice de taille n*p où n est le nombre d'observations (ie le nombre de répétitions) et p le nombre de variables observées
+#On note X la matrice des covariables. X est une matrice de taille n*d ou d représente le nombre de covariables observées.
+#On note param le vecteur contenant les paramètres de la loi Poisson log normale.
+#   Ceux-ci sont disposés dans l'ordre suivant : les p*d premiers paramètres correspondent aux coefficients de corrélation avec les covariables. Il sont rangés par colonne : les d premières variables sont mu_11 jusqu'à mu_d1 (ie le coeff de corrélation pour chaque covariable par rapport à la première variable observée).
+#                                                Les p paramètres suivant correspondent aux facteurs de variance de chacune des variables observées
+#                                                Enfin tous les paramètres restants correspondent aux paramètres de covariation, rangé par ligne : Sigma_12...Sigma_1p,Sigma_23...Sigma_2p...Sigma_p-1,p
 
 
 #################################################################################################
@@ -173,3 +185,60 @@ param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
 print(grad_CL_f(param_optimaux$solution,Obs_3,O,X))
 param_optim<-optim(par = x_0,fn = neg_CL,gr=neg_grad_CL,method="L-BFGS-B",lower =c(-Inf,-Inf,-Inf,-Inf,-Inf,-Inf,1.0e-7,1.0e-7,1.0e-7,-0.999999,-0.999999,-0.999999),upper = c(rep(Inf,9),0.99999,0.99999,0.99999),Y=Obs_3,X=X,O)
 print(grad_CL_f(param_optim$par,Obs_3,O,X))
+
+#######################################################################################################
+##Simulation de données pour voir la distribution de l'estimateur.
+
+nb_simu = 250
+n=30
+p=3
+d=2
+X1=runif(n,-1,1)
+X2=runif(n,0.5,1.3)
+X=cbind(X1,X2)
+param=c(0.3,0.4,-1.2,0.1,1.4,-0.02,0.2,0.2,0.3,-0.1,0,-0.1)
+O=matrix(1,n,p)
+ctrl <- list(ftol_rel = ifelse(n < 1.5*p, 1e-6, 1e-8), ftol_abs = 0,
+             xtol_rel = 1e-4, xtol_abs = 1e-4, maxeval = 10000, method = "MMA")
+opts <- list( "algorithm" = "NLOPT_LD_MMA",
+              "maxeval" = ctrl$maxeval, "ftol_rel" = ctrl$ftol_rel,
+              "ftol_abs" = ctrl$ftol_abs, "xtol_rel" = ctrl$xtol_rel,
+              "print_level" = max(0,ctrl$trace-1))
+
+
+param_estim=c()
+for (k in 1:nb_simu){
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  x_0=param_0(Obs_3,O,X)
+  param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL, 
+                         lb = c(-Inf,-Inf,-Inf,-Inf,-Inf,-Inf,1.0e-7,1.0e-7,1.0e-7,-0.999999,-0.999999,-0.999999), ub = c(rep(Inf,9),0.99999,0.99999,0.99999), 
+                         opts=opts, Y=Obs_3, X=X,O=O)
+  param_estim=rbind(param_estim,param_optimaux$solution-param)
+}
+for (j in 1:ncol(param_estim)){
+  param_estim[,j]<-param_estim[,j]/sqrt(var(param_estim[,j]))
+}
+write.table(param_estim, file = "/home/teuliere/PLN-Cl/Estim_250", append = FALSE, quote = TRUE, sep = " ",
+            eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+            col.names = TRUE, qmethod = c("escape", "double"))
+
+setwd(dir="/home/teuliere/PLN-Cl")
+Er=read.table("Estim_250",sep=" ",header = TRUE)
+Er=t(Er)
+for (k in 1:nrow(Er)){
+  Er[k,]<-Er[k,]*sqrt(var(Er[k,]))
+}
+for (j in 1:ncol(Er)){
+  Er[,j]<-Er[,j]/sqrt(var(Er[,j]))
+}
+Er2=melt(Er)
+ggplot(data=Er2,aes(x=value))+geom_histogram()+facet_wrap(~Var2,scales="free")+
+theme_bw()
+
+#Estim_10 a été simulé avec les paramètres suivants : nb_simu=10 , n=30, p=3, d=2, X1=runif(n,-1,1), X2=runif(n,0.5,1.3),X=cbind(X1,X2), param=c(0.3,0.4,-1.2,0.1,1.4,-0.02,0.2,0.2,0.3,-0.1,0,-0.1), O=matrix(1,n,p)
+#ctrl <- list(ftol_rel = ifelse(n < 1.5*p, 1e-6, 1e-8), ftol_abs = 0,
+#             xtol_rel = 1e-4, xtol_abs = 1e-4, maxeval = 10000, method = "MMA")
+#opts <- list( "algorithm" = "NLOPT_LD_MMA",
+#              "maxeval" = ctrl$maxeval, "ftol_rel" = ctrl$ftol_rel,
+#              "ftol_abs" = ctrl$ftol_abs, "xtol_rel" = ctrl$xtol_rel,
+#              "print_level" = max(0,ctrl$trace-1))
