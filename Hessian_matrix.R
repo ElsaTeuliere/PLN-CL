@@ -1,7 +1,10 @@
+source('/home/teuliere/PLN-Cl/Script_CLM_Offset.R')
+
 ##Code des dérivées d'ordre 2 pour la matrice de Godambe
 
 ###############################################################################
 #Calcul de la matrice pour une observation :
+#Cette fonction va directement nous sortir le gradient et la matrice hessienne
 
 Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramètres d et p pour éviter ensuite dans la boucle sur les observations d'avoir à les recalculer
   #mise en forme des paramètre 
@@ -13,7 +16,7 @@ Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramètres d et p pour �
   Xmu=O+X%*%Mu
   
   #On commence par calculer tous les termes dont on aura besoin 
-  terms<-matrix(0,4*p,4*p)
+  terms<-matrix(0,5*p,5*p)
   for(j in 2:p){
     for (k in 1:(j-1)){
       for (l in 1:5){
@@ -25,10 +28,10 @@ Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramètres d et p pour �
       }
     }
   }
-  terms<-terms+t(terms)
+  terms<-terms+t(terms) #On peut faire cela car tous les blocs diagonaux sont nuls
   
 #Maintenant on rempli la matrice hessienne
-hess_mat<-matrix(0,d*p+0.5*p*(p-1),d*p+0.5*p*(p-1))
+hess_mat<-matrix(0,d*p+p+0.5*p*(p-1),d*p+p+0.5*p*(p-1))
 #On commence par le bloc des ddérivées par rapport aux termes de moyenne
   #Les dérivées non croisées
   for (j in 1:p){ #on parcourt tous les paramètres mu
@@ -76,17 +79,19 @@ for (j in 1:p){#indice du sigma par rapport auquel on dérive
 }
 #Reste maintenant les dérivées par rapport aux termes de covariance
 #On va créer une liste contenant les indices des termes de covariances
+compteur=1
 liste_indices = list()
 for (j in 1:(p-1)){
   for (k in (j+1):p){
-    liste_indices[[k]]<-c(j,k)
+    liste_indices[[compteur]]<-c(j,k)
+    compteur=compteur+1
   }
 }
 #On rempli d'abord la diagonale du bloc
 for (l in 1:(0.5*p*(p-1))){
   j=liste_indices[[l]][1]
   k=liste_indices[[l]][2]
-  hess_mat[d*p+p+l,d*p+p+l]<- (1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[j]+1)*Y[k]^2*terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[j]+1)*(Y[j]+2)*Y[k]^2*terms[5*(j-1)+3,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[j]+1)*(Y[k]+1) * (2*Y[k]*Y[j]+2*Y[k]+2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[j]+1)*(Y[j]+2)*(Y[k]+1)*(2*Y[k]+1)*terms[5*(j-1)+3,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[j]+1)^2*Y[k]^2*terms[5*(j-1)+2,5*(k-1)+1]^2-2*(Y[j]+1)*(Y[k]+1)*Y[j]*Y[k]*terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+2* (Y[j]+1)^2*(Y[k]+1)*Y[k]*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+2,5*(k-1)+1]-Y[j]^2*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+Y[j]^2*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[k]+1)*(Y[k]+2)*(Y[j]+1)*(2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-Y[j]^2*(Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^+2*(Y[k]+1)^2*Y[j]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[j]+1)*(Y[k]+1)*(Y[j]+2)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+3,5*(k-1)+3]-(Y[j]+1)^2*(Y[k]+1)^2*terms[5*(j-1)+2,5*(k-1)+2]^2)
+  hess_mat[d*p+p+l,d*p+p+l]<- (1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[j]+1)*Y[k]^2*terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[j]+1)*(Y[j]+2)*Y[k]^2*terms[5*(j-1)+3,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[j]+1)*(Y[k]+1) * (2*Y[k]*Y[j]+2*Y[k]+2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[j]+1)*(Y[j]+2)*(Y[k]+1)*(2*Y[k]+1)*terms[5*(j-1)+3,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[j]+1)^2*Y[k]^2*terms[5*(j-1)+2,5*(k-1)+1]^2-2*(Y[j]+1)*(Y[k]+1)*Y[j]*Y[k]*terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+2* (Y[j]+1)^2*(Y[k]+1)*Y[k]*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+2,5*(k-1)+1]-Y[j]^2*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+Y[j]^2*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-(Y[k]+1)*(Y[k]+2)*(Y[j]+1)*(2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-Y[j]^2*(Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+(Y[k]+1)^2*Y[j]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[j]+1)*(Y[k]+1)*(Y[j]+2)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+3,5*(k-1)+3]-(Y[j]+1)^2*(Y[k]+1)^2*terms[5*(j-1)+2,5*(k-1)+2]^2)
 }
 #On s'attaque aux termes croisés avec la moyenne
 for (l in 1 : (0.5*p*(p-1))){
@@ -100,22 +105,54 @@ for (l in 1 : (0.5*p*(p-1))){
   hess_mat[d*p+j,(d+1)*p+l]<-((Y[k]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[j]+1)*(2*Y[k]^2+3*Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2]-3*(Y[j]+1)*(Y[k]+2)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+3]+(Y[j]+1)*(Y[k]+2)*(Y[k]+3)*terms[5*(j-1)+2,5*(k-1)+4]+Y[j]*(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]+Y[j]*(Y[k]+2)*(2*Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+3]- Y[j]*(Y[k]+2)*(Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+4])+(Y[k]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]+Y[j]*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]-(Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2])*((Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]-(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]))
   #les termes sigma_kk sigma_jk
   hess_mat[d*p+k,(d+1)*p+l]<-((Y[j]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[k]+1)*(2*Y[j]^2+3*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]-3*(Y[k]+1)*(Y[j]+2)*(Y[j]+1)*terms[5*(j-1)+3,5*(k-1)+2]+(Y[k]+1)*(Y[j]+2)*(Y[j]+3)*terms[5*(j-1)+4,5*(k-1)+2]+Y[k]*(2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]+Y[k]*(Y[j]+2)*(2*Y[j]+3)*terms[5*(j-1)+3,5*(k-1)+1]- Y[k]*(Y[j]+2)*(Y[j]+3)*terms[5*(j-1)+4,5*(k-1)+1])+(Y[j]*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]+Y[k]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]-(Y[j]+1)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2])*((Y[j]+2)*terms[5*(j-1)+3,5*(k-1)+1]-(2*Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]))
-  #Il nous reste les termes croisés de covariance
-  for (lp in 1:l-1){
-    jp=liste_indices[[lp]][1]
-    kp=liste_indices[[lp]][2]
-    if (jp = j){#sigma_jk sigma_ji
-      hess_mat[(d+1)*p+lp,(d+1)*p+l]<- 
-    }
-    if (kp=k){#sigma_jk sigam_ik
-      hess_mat[(d+1)*p+lp,(d+1)*p+l]<-
-    }
-    if(kp=j){#sigma_jk sigma_ki
+  #Il nous reste les termes croisés de covariance qui sont tous nuls
+}
+gradCL_calc<-rep(0,d*p+p+0.5*p*(p-1))
+for (j in 1:p){#dérivées par rapport aux termes de moyenne
+  for (k in 1:p){
+    if (j != k){gradCL_calc[((j-1)*d+1):(k*j)]<-gradCL_calc[((j-1)*d+1):(j*d)]+X*(Y[j]-(Y[j]+1)*(terms[5*(j-1)+2,5*(k-1)+1]/terms[5*(j-1)+1,5*(k-1)+1]))
       
     }
   }
-  }
-
-
-return(hess_mat)
 }
+for (j in 1:p){#Dérivées par rapport aux termes de variance
+  for (k in 1:p){
+    if (j != k) {
+     gradCL_calc[d*p+j]<-gradCL_calc[d*p+j]+ (Y[k]^2-(Y[k]+1)*(2*Y[k]+1)*(terms[5*(j-1)+1,5*(k-1)+2]/terms[5*(j-1)+1,5*(k-1)+1])+(Y[k]+1)*(Y[k]+2)*(terms[5*(j-1)+1,5*(k-1)+3]/terms[5*(j-1)+1,5*(k-1)+1]))
+    }
+  }
+}
+for (l in 1:(0.5*p*(p-1))){
+  j=liste_indices[[l]][1]
+  k=liste_indices[[l]][2]
+  gradCL_calc[d*p+p+l]<-Y[k]*Y[j]-(Y[k]+1)*Y[j]*(terms[5*(j-1)+1,5*(k-1)+2]/terms[5*(j-1)+1,5*(k-1)+1])-Y[k]*(Y[j]+1)*(terms[5*(j-1)+2,5*(k-1)+1]/terms[5*(j-1)+1,5*(k-1)+1]) + (Y[j]+1)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2]/terms[5*(j-1)+1,5*(k-1)+1]
+  
+}
+return(list(hess_mat,gradCL_calc))
+}
+
+
+ Estimateur_Hessian_esp<-function(param,Yobs,Xobs,Oobs){#On va calculer la moyenne empirique sur toutes les observation de la matrice hessienne
+   n=nrow(Yobs)
+   p=ncol(Yobs)
+   d=ncol(Xobs)
+   Esp_hess=matrix(0,(p*d+p+0.5*p*(p-1)),(p*d+p+0.5*p*(p-1)))
+   Esp_gradCL = matrix(0,(p*d+p+0.5*p*(p-1)),(p*d+p+0.5*p*(p-1)))
+   for (k in 1:n){
+     objets<-Hessian(param,Yobs[k,],Xobs[k,],Oobs[k,],d,p)
+     Esp_hess<-Esp_hess+objets[[1]]
+     Esp_gradCL<-Esp_gradCL+objets[[2]]
+   }
+   return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
+ }
+
+
+##Test
+param=c(2,1.5,1,1,-0.5)
+p=2
+n=20
+X=matrix(1,n,1)
+O=matrix(1,n,p)
+
+Obs_1=Observations_simulees_bis(n,p,X,O,param)
+Hessian(param,Obs_1[1,],X[1,],O[1,],1,2)
