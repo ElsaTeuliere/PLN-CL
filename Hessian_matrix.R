@@ -100,7 +100,7 @@ for (l in 1 : (0.5*p*(p-1))){
   #On remplit tout d'abord les blocs mu_j sigma_jk
   hess_mat[((j-1)*d+1):(j*d),d*p+p+l]<-X*((Y[j]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[j]+1)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2]-Y[k]*terms[5*(j-1)+2,5*(k-1)+1]+(Y[j]+2)*Y[k]*terms[5*(j-1)+3,5*(k-1)+1]-(Y[j]+2)*(Y[k]+1)*terms[5*(j-1)+3,5*(k-1)+2]) +terms[5*(j-1)+2,5*(k-1)+1] *(-Y[j]*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]-(Y[j]+1)*Y[k]*terms[5*(j-1)+2,5*(k-1)+1]+(Y[j]+1)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2]) )
   #On remplit maintenant les mu_k sigma_jk
-  hess_mat[((k-1)*d+1):k*d,d*p+p+l] <- X*((Y[j]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]-Y[j]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[k]+2)*Y[j]*terms[5*(j-1)+1,5*(k-1)+3]-(Y[k]+2)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+3]) +terms[5*(j-1)+1,5*(k-1)+2] *(-Y[k]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]-(Y[k]+1)*Y[j]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]) )
+  hess_mat[((k-1)*d+1):(k*d),d*p+p+l] <- X*((Y[j]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]-Y[j]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[k]+2)*Y[j]*terms[5*(j-1)+1,5*(k-1)+3]-(Y[k]+2)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+3]) +terms[5*(j-1)+1,5*(k-1)+2] *(-Y[k]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]-(Y[k]+1)*Y[j]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2]) )
   #les termes sigma_jj sigma_jk
   hess_mat[d*p+j,(d+1)*p+l]<-((Y[k]+1)/terms[5*(j-1)+1,5*(k-1)+1]^2) *(terms[5*(j-1)+1,5*(k-1)+1]*((Y[j]+1)*(2*Y[k]^2+3*Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+2]-3*(Y[j]+1)*(Y[k]+2)*(Y[k]+1)*terms[5*(j-1)+2,5*(k-1)+3]+(Y[j]+1)*(Y[k]+2)*(Y[k]+3)*terms[5*(j-1)+2,5*(k-1)+4]+Y[j]*(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]+Y[j]*(Y[k]+2)*(2*Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+3]- Y[j]*(Y[k]+2)*(Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+4])+(Y[k]*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+1]+Y[j]*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]-(Y[k]+1)*(Y[j]+1)*terms[5*(j-1)+2,5*(k-1)+2])*((Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]-(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]))
   #les termes sigma_kk sigma_jk
@@ -110,7 +110,8 @@ for (l in 1 : (0.5*p*(p-1))){
 gradCL_calc<-rep(0,d*p+p+0.5*p*(p-1))
 for (j in 1:p){#dérivées par rapport aux termes de moyenne
   for (k in 1:p){
-    if (j != k){gradCL_calc[((j-1)*d+1):(k*j)]<-gradCL_calc[((j-1)*d+1):(j*d)]+X*(Y[j]-(Y[j]+1)*(terms[5*(j-1)+2,5*(k-1)+1]/terms[5*(j-1)+1,5*(k-1)+1]))
+    if (j != k){
+      gradCL_calc[((j-1)*d+1):(d*j)]<-gradCL_calc[((j-1)*d+1):(j*d)]+X*(Y[j]-(Y[j]+1)*(terms[5*(j-1)+2,5*(k-1)+1]/terms[5*(j-1)+1,5*(k-1)+1]))
       
     }
   }
@@ -132,7 +133,7 @@ return(list(hess_mat,gradCL_calc))
 }
 
 
- Estimateur_Hessian_esp<-function(param,Yobs,Xobs,Oobs){#On va calculer la moyenne empirique sur toutes les observation de la matrice hessienne
+ Estimateurs_esp<-function(param,Yobs,Xobs,Oobs){#On va calculer la moyenne empirique sur toutes les observation de la matrice hessienne
    n=nrow(Yobs)
    p=ncol(Yobs)
    d=ncol(Xobs)
@@ -141,7 +142,7 @@ return(list(hess_mat,gradCL_calc))
    for (k in 1:n){
      objets<-Hessian(param,Yobs[k,],Xobs[k,],Oobs[k,],d,p)
      Esp_hess<-Esp_hess+objets[[1]]
-     Esp_gradCL<-Esp_gradCL+objets[[2]]
+     Esp_gradCL<-Esp_gradCL+objets[[2]]%*%t(objets[[2]])
    }
    return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
  }
