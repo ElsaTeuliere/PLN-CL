@@ -21,8 +21,8 @@ Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramÃ¨tres d et p pour Ã
     for (k in 1:(j-1)){
       for (l in 1:5){
         for (m in 1:5){
-          if (l+m<6){
-            terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+l-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Rho[k,j])
+          if (l+m<7){
+            terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Rho[k,j])
           }
         }
       }
