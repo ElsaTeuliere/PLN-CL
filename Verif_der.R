@@ -252,3 +252,7 @@ param<-c( 0.1430776, 0.4540851, 1.8289825, 0.6347092, 0.8830140, 2.8492039, 1.83
 hes_approx<-approx_hes(param,Obs,O,X,epsilon)
 hes<-n*Estimateurs_esp(param,Obs,X,O)[[1]]
 epsilon=10^(-6)
+
+##Les dériées secondes ont l'air OK too
+
+

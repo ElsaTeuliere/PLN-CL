@@ -54,8 +54,10 @@ source('/home/teuliere/PLN-Cl/Hessian_matrix.R')
 setwd(dir="/home/teuliere/PLN-Cl")
 n=100
 nb_simu=250
-p_set=2:10
+p_set=c(5,7,10,15,30,50)
 d_set=1:3
+temps_moyen<-list()
+nombre_iterations<-list()
 for (p in p_set){
   O=matrix(1,n,p)
   for (d in d_set){
@@ -65,7 +67,7 @@ for (p in p_set){
         X<-cbind(X,runif(n,-1,1))
       }
     }
-    mu<-runif(p*d,0,3)
+    mu<-runif(p*d,0,1)
     Var_Cov<-var_cov(p)
     param<-c(mu,diag(Var_Cov))
     for (j in 1:(p-1)){
@@ -81,14 +83,25 @@ for (p in p_set){
                   "ftol_abs" = ctrl$ftol_abs, "xtol_rel" = ctrl$xtol_rel,
                   "print_level" = max(0,ctrl$trace-1))
     param_estim=c()
+    c=0
+    tps<-0
     for (k in 1:nb_simu){
       Obs_3=Observations_simulees_bis(n,p,X,O,param)
+      b_time<-Sys.time()
       x_0=param_0(Obs_3,O,X)
-      param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
-                             lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1))), ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1))),
-                             opts=opts, Y=Obs_3, X=X,O=O)
-      param_estim=rbind(param_estim,param_optimaux$solution)
+      lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
+      ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1)))
+      if (all(x_0<=ub) & all(x_0>=lb)){
+        param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
+                              lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1))), ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1))),
+                              opts=opts, Y=Obs_3, X=X,O=O)
+        param_estim=rbind(param_estim,param_optimaux$solution)
+        c<-c+1
+        tps<-tps+(Sys.time()-b_time)
+        nombre_iterations[length(nombre_iterations)+1]<-param_optimaux$iter
+      }
     }
+    temps_moyen[[length(temps_moyen)+1]]<-tps/c
     param_estim_norm<-param_estim
     for (j in 1:nrow(param_estim)){#Ici on calcule la matrice de Godambe pour chaque jeu de paramètres estimés
       V_inf=Estimateurs_esp(param_estim[j,],Obs_3,X,O)
