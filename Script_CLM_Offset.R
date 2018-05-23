@@ -43,6 +43,22 @@ CL_f<-function(param,Y,O,X){
   return(CL)
 }
 
+CL_f_uni<-function(param,Y,O,X,d,p,Xmu,Sigma,Rho){
+  Mu=matrix(param[1:(p*d)],d,p)
+  Sigma=param[(p*d+1):(p*d+p)]
+  Rho=matrix(0,nrow=p,ncol=p)
+  Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
+  Rho=t(Rho)+Rho+diag(Sigma,p,p) #matrice de variance/covariance
+  Xmu=O+X%*%Mu
+  CL<-0
+  for (j in 1:(p-1)){
+    for (k in (j+1):p){
+      CL<-CL+log(dbipoilog(Y[j],Y[k],mu1=Xmu[j],mu2=Xmu[k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Rho[j,k]))
+    }
+  }
+  return(CL)
+}
+
 neg_CL<-function(param,Y,O,X){
   return(-CL_f(param,Y,O,X))
 }

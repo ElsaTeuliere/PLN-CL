@@ -147,6 +147,17 @@ return(list(hess_mat,gradCL_calc))
    return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
  }
 
+ 
+ symetrisation<-function(M){
+   for (k in 2:nrow(M)){
+     for (j in 1:(k-1)){
+       if (M[k,j]==0){
+         M[k,j]=M[j,k]
+       }
+     }
+   }
+   return (M)
+ }
 
 ##Test
 param=c(2,1.5,1,1,-0.5)

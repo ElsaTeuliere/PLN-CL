@@ -20,13 +20,117 @@ approx_hes<-function(param,Y,O,X,epsilon){
   #Cette fonction permet d'approcher la valeur du gradient  en utilisant un pas epsilon
   approx_hess<-matrix(0,length(param),length(param))
   for (j in 1:length(param)){
-      param_per<-param
-      param_per[j]<-param[j]+epsilon
-      approx_hess[,j]<-(grad_CL_opt(param_per,Obs,O,X)-grad_CL_opt(param,Obs,O,X))/epsilon
-    }
+    param_per<-param
+    param_per[j]<-param[j]+epsilon
+    approx_hess[,j]<-(grad_CL_opt(param_per,Obs,O,X)-grad_CL_opt(param,Obs,O,X))/epsilon
+  }
   return(approx_hess)
 }
 
+
+approx_hes_uni<-function(param,Y,O,X,epsilon){
+  #Cette fonction permet d'approcher la valeur du gradient  en utilisant un pas epsilon
+  approx_hess<-matrix(0,length(param),length(param))
+  Mu=matrix(param[1:(p*d)],d,p)
+  Sigma=param[(p*d+1):(p*d+p)]
+  Rho=matrix(0,nrow=p,ncol=p)
+  Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
+  Rho=Rho+t(Rho)
+  Xmu=O+X%*%Mu
+  for (j in 1:length(param)){
+    param_per<-param
+    param_per[j]<-param[j]+epsilon
+    Mu_per=matrix(param_per[1:(p*d)],d,p)
+    Sigma_per=param_per[(p*d+1):(p*d+p)]
+    Rho_per=matrix(0,nrow=p,ncol=p)
+    Rho_per[lower.tri(Rho_per,diag=F)]<-param_per[(p*d+p+1):length(param_per)]
+    Rho_per=Rho_per+t(Rho_per)
+    Xmu_per=O+X%*%Mu_per
+    approx_hess[,j]<-(grad_CL_uni(Y,X,O,d,p,Xmu_per,Sigma_per,Rho_per)-grad_CL_uni(Y,X,O,d,p,Xmu_per,Sigma_per,Rho_per))/epsilon
+  }
+  return(approx_hess)
+}
+
+
+approx_uni_bis<-function(param,Y,O,X,epsilon){
+  d=length(X)
+  p=length(O)
+  approx_hess<-matrix(0,length(param),length(param))
+  Mu=matrix(param[1:(p*d)],d,p)
+  Sigma=param[(p*d+1):(p*d+p)]
+  Rho=matrix(0,nrow=p,ncol=p)
+  Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
+  Rho=Rho+t(Rho)
+  Xmu=O+X%*%Mu
+  #On va remplir la matrice comme on fait pour construire la matrice hessienne
+  approx_hess<-matrix(0,length(param),length(param))
+  #On commence par les termes de moyenne
+  termes_derivees<-grad_CL_uni(Y,X,O,d,p,Xmu,Sigma,Rho)
+  terme_original<-CL_f_uni(param,Y,O,X,d,p)
+  for (j in 1:(d*p)){ #on fixe le paramètre de moyenne
+    param_per_1<-param
+    param_per_1[j]<-param[j]+epsilon
+    approx_hess[j,j]<-(2/epsilon^2)*(CL_f_uni(param_per_1,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[j])
+    if(j<(d*p)){
+      for (k in (j+1):(d*p)){
+        param_per_2<-param_per_1
+        param_per_2[k]<-param_per_1[k]+epsilon
+        approx_hess[j,k]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[j]-epsilon*termes_derivees[k])
+      }
+    }
+  }
+  #On rempli maintenant les termes de variances
+  for (j in 1:p){ #on fixe le paramètre de variance que l'on étudie
+    indice=d*p+j
+    param_per_1<-param
+    param_per_1[indice]<-param[indice]+epsilon
+    #dérivée non croisée
+    approx_hess[indice,indice]<-(2/epsilon^2)*(CL_f_uni(param_per_1,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice])
+    #termes de dérivée croisée avec la moyenne
+    for (k in 1:(d*p)){
+      param_per_2<-param_per_1
+      param_per_2[k]<-param_per_1[k]+epsilon
+      approx_hess[k,indice]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice]-epsilon*termes_derivees[k])
+    }
+    #termes de dérivée croisés avec la variance
+    if(j<p){
+      for (k in (j+1):p){
+        indice_prime=d*p+k
+        param_per_2<-param_per_1
+        param_per_2[indice_prime]<-param_per_1[indice_prime]+epsilon
+        approx_hess[indice,indice_prime]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice]-epsilon*termes_derivees[indice_prime])
+      }
+    }
+  }
+  #On dérive maintenant par rapport aux termes de covariance
+  for (l in 1:(0.5*p*(p-1))){
+    indice=d*p+p+l
+    param_per_1<-param
+    param_per_1[indice]<-param[indice]+epsilon
+    approx_hess[indice,indice]<-(2/epsilon^2)*(CL_f_uni(param_per_1,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice])
+    #termes croisés avec la moyenne
+    for (k in 1:(d*p)){
+      param_per_2<-param_per_1
+      param_per_2[k]<-param_per_1[k]+epsilon
+      approx_hess[k,indice]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice]-epsilon*termes_derivees[k])
+    }
+    for (k in 1:p){
+      indice_prime=d*p+k
+      param_per_2<-param_per_1
+      param_per_2[indice_prime]<-param_per_1[indice_prime]+epsilon
+      approx_hess[indice_prime,indice]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice]-epsilon*termes_derivees[indice_prime])
+    }
+    if(l<(0.5*p*(p-1))){
+      for (k in (l+1):(0.5*p*(p-1))){
+        indice_prime=d*p+p+k
+        param_per_2<-param_per_1
+        param_per_2[indice_prime]<-param_per_1[indice_prime]+epsilon
+        approx_hess[indice,indice_prime]<-(1/epsilon^2)*(CL_f_uni(param_per_2,Y,O,X,d,p)-terme_original-epsilon*termes_derivees[indice]-epsilon*termes_derivees[indice_prime])
+      }
+    }
+  }
+  return(approx_hess)
+}
 
 norme_L2<-function(x){
   return(sqrt(sum(x^2)))
@@ -254,5 +358,18 @@ hes<-n*Estimateurs_esp(param,Obs,X,O)[[1]]
 epsilon=10^(-6)
 
 ##Les dériées secondes ont l'air OK too
+epsilon=10^(-6)
+hes_approx<-approx_uni_bis(param,Y,O,X,epsilon)
+hes<-Hessian(param,Y,X,O,d,p)[[1]]
+delta_hes<-matrix(NA,nrow(hes),ncol(hes))
+for (i in 1:nrow(hes)){
+  for (j in 1:ncol(hes)){
+    if (hes[i,j]!=0){
+      delta_hes[i,j]<-abs(hes_approx[i,j]-hes[i,j])/hes[i,j]
+    }
+  }
+}
 
 
+###########
+##Peut-être que l'erreur vient du fait qu'on ne rerempli pas la matrice dont on a rempli en gros que le triangle sup.

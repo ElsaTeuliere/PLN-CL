@@ -105,16 +105,20 @@ for (p in p_set){
     param_estim_norm<-param_estim
     for (j in 1:nrow(param_estim)){#Ici on calcule la matrice de Godambe pour chaque jeu de paramètres estimés
       V_inf=Estimateurs_esp(param_estim[j,],Obs_3,X,O)
-      Vp_inf=ginv(V_inf[[1]])
+      Vp_inf=ginv(symetrisation(V_inf[[1]]))
       Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
       param_estim_norm[j,]<-(param_estim[j,]-param)/sqrt(diag(Godambe))
     }
-    name_table=paste(c('values',as.character(p),as.character(d)), collapse = "")
-    name_graph=paste(c('graph',as.character(p),as.character(d)), collapse = "")
-    write.table(param_estim_norm, file = paste(c("/home/teuliere/PLN-Cl/",name_table),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
+    name_table=paste(c('values',as.character(p),as.character(d),"_new"), collapse = "")
+    name_table_norm=paste(c('values',as.character(p),as.character(d),"_norm_new"), collapse = "")
+    name_graph=paste(c('graph',as.character(p),as.character(d),"_new"), collapse = "")
+    write.table(param_estim_norm, file = paste(c("/home/teuliere/PLN-Cl/",name_table_norm),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
                 eol = "\n", na = "NA", dec = ".", row.names = TRUE,
                 col.names = TRUE, qmethod = c("escape", "double"))
-    E_20=read.table(name_table,sep="\t",header = TRUE)
+    write.table(param_estim, file = paste(c("/home/teuliere/PLN-Cl/",name_table),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
+                eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+                col.names = TRUE, qmethod = c("escape", "double"))
+    E_20=read.table(name_table_norm,sep="\t",header = TRUE)
     E_202=melt(E_20)
     plt<-ggplot(data=E_202,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
       theme_bw()
