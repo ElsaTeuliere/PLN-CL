@@ -128,6 +128,21 @@ for (p in p_set){
   }
 }
 
+E_bis=read.table(name_table,sep="\t",header=TRUE)
+E_bis_norm=E_bis
+for (j in 1:nb_simu){
+  param_estim=E_bis[j,]
+  V_inf_approx=symetrisation(hes_approx_tot(param,Obs_3,O,X,epsilon=10^(-6)))
+  Vp_inf_approx=ginv(V_inf_approx)
+  V_inf=Estimateurs_esp(param_estim,Obs_3,X,O)
+  Godambe=Vp_inf_approx%*%V_inf[[2]]%*%Vp_inf_approx
+  E_bis_norm[j,]<- (E_bis[j,]-param)/sqrt(diag(Godambe))
+}
+
+
+
+
+
 
 
 
