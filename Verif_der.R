@@ -444,3 +444,55 @@ for (i in 1:nrow(hes)){
 
 ###########
 ##Peut-être que l'erreur vient du fait qu'on ne rerempli pas la matrice dont on a rempli en gros que le triangle sup.
+
+
+
+##################################################################################################################################
+##Vérification grâce à l'approximation numérique fournie par optim
+
+#Simulation des paramètres
+p=5
+d=2
+n=50
+nb_simu=250
+O=matrix(1,n,p)
+X=matrix(runif(n,-1,1),n,1)
+if(d>1){
+  for (j in 1:(d-1)){
+    X<-cbind(X,runif(n,-1,1))
+  }
+}
+mu<-runif(p*d,0,2)
+Var_Cov<-var_cov(p)
+param<-c(mu,diag(Var_Cov))
+for (j in 1:(p-1)){
+  for (k in (j+1):p){
+    a=Var_Cov[j,k]
+    param=c(param,a)
+  }
+}
+
+param_estim=c()
+param_estim_norm=c()
+diff_hessian=c()
+##Simulation des observations
+for (k in 1:nb_simu){
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  x_0=param_0(Obs_3,O,X)
+
+  ##Optimisation avec optim
+  lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
+  ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1)))
+  if (all(x_0<=ub) & all(x_0>=lb)){
+    param_optimaux<-optim(x_0,neg_CL,neg_grad_CL,method = "L-BFGS-B",lower=lb,upper=ub,hessian = TRUE, Y=Obs_3,O=O,X=X)
+    param_estim=rbind(param_estim,param_optimaux$par)
+    V_inf=Estimateurs_esp(param_optimaux$par,Obs_3,X,O)
+    Vp_inf=ginv(param_optimaux$hessian)
+    Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
+    param_estim_norm<-rbind(param_estim_norm,(param_optimaux$par-param)/sqrt(diag(Godambe)))
+    diff_hessian=c(diff_hessian, max(abs(symetrisation(V_inf[[1]])-param_optimaux$hessian)))
+  }
+}
+E_prime=melt(data.frame(param_estim_norm))
+pltt<-ggplot(data=E_prime,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
+  theme_bw()
