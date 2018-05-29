@@ -149,7 +149,28 @@ norme_L2<-function(x){
 
 #######################################################################################################################
 ##En calculant Godambe avec les bonnes observations
-
+n=100
+nb_simu=250
+p=5
+d=3
+O=matrix(1,n,p)
+X=matrix(runif(n,-1,1),n,1)
+if(d>1){
+  for (j in 1:(d-1)){
+    X<-cbind(X,runif(n,-1,1))
+  }
+}
+mu<-runif(p*d,0,1)
+Var_Cov<-var_cov(p)
+param<-c(mu,diag(Var_Cov))
+for (j in 1:(p-1)){
+  for (k in (j+1):p){
+    a=Var_Cov[j,k]
+    param=c(param,a)
+  }
+}
+temps_moyen<-list()
+nombre_iterations<-list()
 param_estim=c()
 param_estim_norm<-c()
 c=0
@@ -171,10 +192,10 @@ for (k in 1:nb_simu){
     grad_sortie_nloptr<-c(grad_sortie_nloptr,norme_L2(grad_CL_opt(param_optimaux$solution,Obs_3,O,X)))
     c<-c+1
     nombre_iterations[length(nombre_iterations)+1]<-param_optimaux$iter
-    V_inf=Estimateurs_esp(param_optimaux$solution,Obs_3,X,O)
+    V_inf=Estimateurs_esp_corr(param_optimaux$solution,Obs_3,X,O)
     Vp_inf=ginv(symetrisation(V_inf[[1]]))
     Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
-    param_estim_norm<-rbind(param_estim_norm,(param_optimaux$solution-param)/sqrt(diag(Godambe)))
+    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$solution-param))/sqrt(diag(Godambe)))
     tps<-tps+(Sys.time()-b_time)
   }
 }
@@ -462,7 +483,7 @@ if(d>1){
     X<-cbind(X,runif(n,-1,1))
   }
 }
-mu<-runif(p*d,0,2)
+mu<-runif(p*d,0,1)
 Var_Cov<-var_cov(p)
 param<-c(mu,diag(Var_Cov))
 for (j in 1:(p-1)){
@@ -480,11 +501,21 @@ for (k in 1:nb_simu){
   Obs_3=Observations_simulees_bis(n,p,X,O,param)
   x_0=param_0(Obs_3,O,X)
 
+  ##paramètres de optim
+  ctrl <- list(ftol_rel = ifelse(n < 1.5*p, 1e-6, 1e-8), ftol_abs = 0,
+               xtol_rel = 1e-4, xtol_abs = 1e-4, maxeval = 10000, method = "MMA")
+  opts <- list("maxit"=40)
+  fonction_a_optimiser<-function(param){
+    return(neg_CL(param,Obs_3,O,X))
+  }
+  gradient_optim<-function(param){
+    return(neg_grad_CL(param,Obs_3,O,X))
+  }
   ##Optimisation avec optim
-  lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
-  ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1)))
+  lb = c(rep(-10^4,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
+  ub = c(rep(10^4,p*d+p),rep(0.999,0.5*p*(p-1)))
   if (all(x_0<=ub) & all(x_0>=lb)){
-    param_optimaux<-optim(x_0,neg_CL,neg_grad_CL,method = "L-BFGS-B",lower=lb,upper=ub,hessian = TRUE, Y=Obs_3,O=O,X=X)
+    param_optimaux<-optim(par=x_0,fn=fonction_a_optimiser,gr=gradient_optim,method = "L-BFGS-B",lower=lb,upper=ub,hessian = TRUE, control=opts)
     param_estim=rbind(param_estim,param_optimaux$par)
     V_inf=Estimateurs_esp(param_optimaux$par,Obs_3,X,O)
     Vp_inf=ginv(param_optimaux$hessian)
@@ -493,6 +524,7 @@ for (k in 1:nb_simu){
     diff_hessian=c(diff_hessian, max(abs(symetrisation(V_inf[[1]])-param_optimaux$hessian)))
   }
 }
-E_prime=melt(data.frame(param_estim_norm))
+E=data.frame(param_estim_norm)
+E_prime=melt(E)
 pltt<-ggplot(data=E_prime,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
   theme_bw()
