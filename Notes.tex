@@ -15,6 +15,7 @@
 %stepnumber=1,
 %tabsize=4
 %}
+\usepackage{lscape}
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}
 \setcounter{theorem}{0}
@@ -333,6 +334,94 @@ What we can also write :
 & -(y_j+1)y_k p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)+ (y_k+1) (y_j+1)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+1,y_k+1))
 \end{align*}
 Again we are interested in $\partial_{\sigma_{jk}}\mathrm{log}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$ which we can now easily calculate by dividing the above quantity by $p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$.
+
+\section{Assymptotic normality}
+\subsection{Theoric result}
+Again, we will here use the results from \cite{vaart_1998}. We have the following theorem.
+\begin{theorem}
+
+\end{theorem}
+In order to be able to estimate the Godambe matrix we have to calculate the second derivative of the composite likelihood. Using the formula we get in the previous section, one have :
+\begin{landscape}
+\paragraph{$\partial^2 \mu_i$}
+\begin{align*}
+\partial^2  \mu_i \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =& X X^T \sum_{j \neq i} \frac{1}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [(Y_i+1)(Y_i+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j)\\& - (Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)-(Y_i+1)^2 p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)^2] 
+\end{align*}
+\paragraph{$\partial \mu_j \partial \mu_i$ ($i \neq j$)}
+\begin{align*}
+\partial^2 _{\mu_i \mu_j} \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) = X X^T \frac{(Y_i+1)(Y_j+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij})\mid X}(Y_i,Y_j) - p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)]
+\end{align*}
+\paragraph{$\partial^2 \sigma_{ii}$}
+\begin{align*}
+\partial^2 \sigma_{ii}\mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =  \sum_{j \neq i} & \frac{(Y_j+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [ -(2 Y_j+1)^2 p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&+(Y_j+2) (4 Y_j^2 + 12 Y_j +7) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&- 2 (Y_j+2)(Y_j+3)(2 Y_j+3) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+3)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+& -(2 Y_j+1)^2 (Y_j+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)^2\\
+& + 2(Y_j+1)(Y_j+2)(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)\\
+&+(Y_j+2)(Y_j+3)(Y_j+4)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+4)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&-(Y_j+2)^2(Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)^2]
+\end{align*}
+\paragraph{$\partial^2 \sigma_{ii} \sigma_{jj}$ ($i \neq j$}
+\begin{align*}
+\partial^2 \sigma_{ii}\mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) = & \frac{(Y_j+1)(Y_i+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [(2Y_i+1) [ (2Y_j+1) (p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) - p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1) )\\
+& + (Y_j+2) (p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)- p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+2) )]\\
+& + (Y_i+2) [ (2Y_j+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j)-p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) )\\
+& +(Y_j+2) ( p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+2)-p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j) ) ] ]
+\end{align*}
+\paragraph{$\partial \sigma_{ii} \mu_{ii}$}
+\begin{align*}
+\partial^2 \sigma_{ii} \mu_{ii} \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =  X \sum_{j \neq i} & \frac{(Y_i+1)(Y_j+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [(2Y_j+1) (p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)-p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j))\\
+& + (Y_j+2) (p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)-p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) ) ]
+\end{align*}
+\paragraph{$\partial \sigma_{ii} \mu{jj}$ ($i \neq j$)}
+\begin{align*}
+\partial^2 \sigma_{ii} \mu_{jj} \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =& X \frac{(Y_j+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2}[-(2Y_j+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+& + (Y_j+2) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) [(2Y_j+3)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)-(Y_j+3) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+3)] \\
+&+ (Y_j+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)[(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)-(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)]]
+\end{align*}
+\paragraph{$\partial^2\sigma_{ij}$}
+\begin{align*}
+\partial^2 \sigma_{ij}  \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =& \frac{1}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2}[-(Y_j)^2(Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&+(Y_i+1)(Y_j+1)(2Y_iY_k+2Y_i+2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&+(Y_i)^2(Y_j+1)(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&-(Y_j+1)(Y_j+2)(Y_i+1)(2Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&-Y_i^2(Y_j+1)^2 p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)^2 - 2 Y_iY_j(Y_i+1-Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)\\
+&+2 Y_i (Y_j+1)^2(Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)\\
+&-Y_j^2(Y_k+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&+Y_j^2(Y_i+1)(Y_i+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)-(Y_i+1)^2Y_j^2 p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)^2\\
+&+2(Y_i+1)^2Y_j(Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)\\
+&-(Y_i+1)(Y_j+1)(Y_i+2)(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&(Y_i+1)(Y_i+2)(Y_j+1)(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)-(Y_i+1)^2(Y_j+1)^2p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)^2
+\end{align*}
+\end{landscape}
+\section{Application to spatial models}
+\subsection{Spatial models}
+We will here reverse the problem. We considere the case in which we have one specie but several sampling sites. The aime is to use or PNL-model in order to estimate the dependance-structure between the sites. \\
+\\
+As it is usually the case in spatial models \cite{cressie2015statistics} we assume the matrix of varince-covariance to be in the form :
+\begin{align*}
+\Sigma = \sigma^2 \begin{pmatrix}
+1 &  e^{-\alpha d_{1,2}} &  e^{-\alpha d_{1,2}} & \ldots &  e^{- \alpha d_{1,n}}  \\
+ e^{-\alpha d_{1,2}} & 1 & \ldots & \ldots &  e^{- \alpha d_{2,n}}\\
+ \vdots & & \ddots & & \vdots\\
+ \vdots & & & \ddots & \vdots \\
+ e^{-\alpha d_{1,n}} &  e^{-\alpha d_{2,n}} & \ldots & \ldots & 1 
+\end{pmatrix}
+\end{align*}
+avec $ (\sigma, \alpha) \in \mathbb{R}_{+}$.
+The idea here is to adapt our PLN model in order to estimate $\sigma^2$ and $\alpha$. 
+
+\subsection{Sampling planning and calculation costs}
+
+The calculation costs the maximum-likelihood estimators is very high, especially when the number of sampled sites is high. Our idea is to maximize the composite-likelihood only over a finite number of couples, \textit{ie} to estimate the parameters by maximizing the $\mathrm{CL}^{I} = \sum_{(i,j) \in I} log( p_{\theta}(Y_i,Y_j))$, with $I$ a subset of $\{(j,k) \in \{1...n\}^2\}$. The question is, how to choose an optimal subset $I$.\\
+\\
+Note $\overhat{\sigma_{ij}}$ an estimator of the parameter of covariance $\sigma_{ij}$.
+One have, by a linear model :
+\begin{align*}
+\mathrm{ln}(\overhat{\sigma_{ij}} = mathrm{ln} ( \sigma^2) - \alpha d_ij + E_{ij}
+\end{align*}
+With $E_{ij}$ a noise due to estimation. We estime this noise to be  identically distributed  for all the couples considered.
+A classical result gives that the variance of the regression is given by : 
 \bibliographystyle{plain}
 \bibliography{Biblio.bib}
 \end{document}

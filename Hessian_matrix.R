@@ -54,7 +54,7 @@ hess_mat<-matrix(0,d*p+p+0.5*p*(p-1),d*p+p+0.5*p*(p-1))
     for (j in 1:p){
       for(k in 1:p){
         if (j != k){
-          hess_mat[d*p+j,d*p+j]<-hess_mat[d*p+j,d*p+j]+(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[k]+1)*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+(2*Y[k]^2+9*Y[k]+7)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-(4*Y[k]^2+16*Y[k]+13)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+4]+(Y[k]+1)^2*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(Y[k]+4)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+5]-(Y[k]+1)^2*(Y[k]+2)^2*terms[5*(j-1)+1,5*(k-1)+3]^2)
+          hess_mat[d*p+j,d*p+j]<-hess_mat[d*p+j,d*p+j]+(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[k]+1)*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+(4*Y[k]^2+12*Y[k]+7)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-(Y[k]+3)*(4*Y[k]+6)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+4]-(Y[k]+1)^2*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+2*(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+2]+(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(Y[k]+4)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+5]-(Y[k]+1)^2*(Y[k]+2)^2*terms[5*(j-1)+1,5*(k-1)+3]^2)
         }
       }
     }
@@ -75,6 +75,12 @@ for (j in 1:p){#indice du sigma par rapport auquel on dérive
     if (k != j){
       hess_mat[((k-1)*d+1):(k*d),d*p+j]<- X * ((Y[k]+1)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(2*Y[k]+1) *terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]+(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*((2*Y[k]+3)* terms[5*(j-1)+1,5*(k-1)+3]-(Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+4])+(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]*((Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+3]-(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2])))
     }
+  }
+}
+#Enfin on calcule les termes du type sigma_j sigma_k
+for (j in 2:p){
+  for (k in 1:(j-1)){
+    hess_mat[(d*p+k),d*p+j]<-(Y[j]+1)*(Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+1]^(-2)*((2*Y[j]+1)*((2*Y[k]+1)*(terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+2,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))+(Y[j]+2)*((2*Y[k]+1)*(terms[5*(j-1)+3,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]-terms[5*(j-1)+3,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+3,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+3,5*(k-1)+1])))
   }
 }
 #Reste maintenant les dérivées par rapport aux termes de covariance
@@ -210,7 +216,7 @@ return(list(hess_mat,gradCL_calc))
    for (j in 1:p){
      for(k in 1:p){
        if (j != k){
-         hess_mat[d*p+j,d*p+j]<-hess_mat[d*p+j,d*p+j]+(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[k]+1)*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+2*(2*Y[k]+1)*(Y[k]+1)^2*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-2*(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(2*Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+4]-(Y[k]+1)^2*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+2*(Y[k]+1)^2*(Y[k]+2)*(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+3]+(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(Y[k]+4)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+5]-(Y[k]+1)^2*(Y[k]+2)^2*terms[5*(j-1)+1,5*(k-1)+3]^2)
+         hess_mat[d*p+j,d*p+j]<-hess_mat[d*p+j,d*p+j]+(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*(-(Y[k]+1)*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]+(4*Y[k]^2+12*Y[k]+7)*(Y[k]+1)*(Y[k]+2)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-2*(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(2*Y[k]+3)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+4]-(Y[k]+1)^2*(2*Y[k]+1)^2*terms[5*(j-1)+1,5*(k-1)+2]^2+2*(Y[k]+1)^2*(Y[k]+2)*(2*Y[k]+1)*terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+3]+(Y[k]+1)*(Y[k]+2)*(Y[k]+3)*(Y[k]+4)*terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+5]-(Y[k]+1)^2*(Y[k]+2)^2*terms[5*(j-1)+1,5*(k-1)+3]^2)
        }
      }
    }
@@ -220,7 +226,7 @@ return(list(hess_mat,gradCL_calc))
      vect=0
      for (k in 1:p){
        if(j !=k){
-         vect<- vect + (Y[j]+1)*(Y[k]+2)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*((2*Y[k]+1)*(terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+2,5*(k-1)+2]-terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))
+         vect<- vect + (Y[j]+1)*(Y[k]+1)*(1/terms[5*(j-1)+1,5*(k-1)+1]^2)*((2*Y[k]+1)*(terms[5*(j-1)+1,5*(k-1)+1]*terms[5*(j-1)+2,5*(k-1)+2]-terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))
        }
      }
      hess_mat[((j-1)*d+1):(j*d), d*p+j]<-X*vect
@@ -236,7 +242,7 @@ return(list(hess_mat,gradCL_calc))
    #Enfin on calcule les termes du type sigma_j sigma_k
    for (j in 2:p){
      for (k in 1:(j-1)){
-       hess_mat[(d*p+k),d*p+j]<-(Y[j]+1)*(Y[k]+1)*((2*Y[j]+1)*((2*Y[k]+1)*(terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+2,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))+(Y[j]+2)*((2*Y[k]+1)*(terms[5*(j-1)+3,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]-terms[5*(j-1)+3,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+3,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+3,5*(k-1)+1])))
+       hess_mat[(d*p+k),d*p+j]<-(Y[j]+1)*(Y[k]+1)*(1/terms[5*(j-1)+1,5*(k-1)+1])^2*((2*Y[j]+1)*((2*Y[k]+1)*(terms[5*(j-1)+2,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+2]*terms[5*(j-1)+2,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+2,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+3]-terms[5*(j-1)+2,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]))+(Y[j]+2)*((2*Y[k]+1)*(terms[5*(j-1)+3,5*(k-1)+1]*terms[5*(j-1)+1,5*(k-1)+2]-terms[5*(j-1)+3,5*(k-1)+2]*terms[5*(j-1)+1,5*(k-1)+1])+(Y[k]+2)*(terms[5*(j-1)+3,5*(k-1)+3]*terms[5*(j-1)+1,5*(k-1)+1]-terms[5*(j-1)+1,5*(k-1)+3]*terms[5*(j-1)+3,5*(k-1)+1])))
      }
    }
    #Reste maintenant les dérivées par rapport aux termes de covariance
