@@ -44,7 +44,7 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 }
 
 \date{\today}
-\author{Elsa TEULIERE, \SR{St\'ephane ROBIN}{}}
+\author{Elsa TEULIERE}
 
 \graphicspath{ {./figures/} }
  
@@ -55,44 +55,52 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 \section*{Introduction}
 \section{Poisson log-normal model}
 \subsection{Definitions and notations}
+\subsubsection{The Model}
+\textit{latent gaussian variables, observations law conditionnal to the latent variables,independance}
+\subsubsection{Extension}
+\textit{regression parameters,offset}
+\subsubsection{Interpretation/advantages}
+\textit{dependency in the gaussian latent variables,.... }
 \subsection{Properties}
-\subsubsection{Moments}
+\subsubsection{Density function and moments}
+\textit{AiH89-Biometrika}
 \subsubsection{Overdispersion}
 \subsection{Variational estimation of the parameters}
-
+\textit{\`a travailler PLN/PCA}
 \section{Composite likelihood estimation}
 \subsection{Definition and notation}
 \subsubsection{Presentation of the composite likelihood}
+\textit{VRF11-StatSinica}
 \subsubsection{Composite likelihood for the PLN model}
+\textit{Expression, definition of the $\Sigma_{ij},\mu_{ij}$, \'equivalence des couples}
 \subsection{Consistency}
+\subsubsection{M-estimator theory}
+\textit{chap.5 Assymptotic Statistics van der Vaart}
+\subsubsection{Consistency of the composite likelihood for the PLN model}
+\textit{proof}
 \subsection{Assymptotic normality}
-\SR{
-\subsection{Calculations and simulations}
-}{}
+\subsubsection{M-estimator theory}
+\textit{chap.5 Assymptotic Statistics van der Vaart}
+\subsubsection{Assymptotic normality of the composite likelihood for the PLN model}
+\textit{proof}
+\subsubsection{Construction of assymptotic statistic tests (?)}
+\textit{Peut-etre trop scolaire...}
 
-\SR{}{
 \section{Composite likelihood inference for spatial data}
 \subsection{Poisson log-normal model for spatial data}
-\subsection{Choosing the pairs (?)}
-}
+\subsubsection{One specie, spatial dependency}
+\subsubsection{spatial parametrisation of the PLN}
+\subsection{Computational optimisation by taking a sparce CL}
 
-\SR{
-\section{Applications}
-\subsection{-}
-\subsection{Spatial data}
-}{}
-
-\SR{}{
 \section{Illustrations}
 \subsection{Simulations}
 \subsection{'Tiques' data}
-}
 
 \appendix
-\SR{}{
 \section{Appendix}
-\subsection{Derivatives}
-\subsection{...}
-}
+\subsection{Gradients}
+\subsection{Hessian}
+\subsection{Spatial gradient and hessian}
+
 
 \end{document}
