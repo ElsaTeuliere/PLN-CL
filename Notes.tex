@@ -393,6 +393,22 @@ In order to be able to estimate the Godambe matrix we have to calculate the seco
 &-(Y_i+1)(Y_j+1)(Y_i+2)(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
 &(Y_i+1)(Y_i+2)(Y_j+1)(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)-(Y_i+1)^2(Y_j+1)^2p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)^2
 \end{align*}
+\paragraph{$\partial^2 \mu_i \sigma_{ij}$}
+\begin{align*}
+\partial^2 \mu_i \sigma_{ij}  \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =& X \frac{(Y_i+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2} [ p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j) ((Y_j+1) (Y_i+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1) - Y_j p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)\\
+&+(Y_i+2)Y_j p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j) - (Y_j+1)(Y_i+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+2,Y_j+1))\\
+& + p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)(-Y_i(Y_j+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)-Y_j (Y_i+1) p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)\\
+&+(Y_j+1)(Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1))]
+\end{align*}
+\paragraph{$\partial^2 \sigma{ij} \sigma{ii}$}
+\begin{align*}
+\partial^2 \sigma_{ii} \sigma_{ij}  \mathcal{CL}(Y^1,...,Y^n,\mu,\Sigma \mid X) =&\frac{(Y_j+1)}{p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)^2}[p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j)\\
+&((Y_i+1)(2Y_j+1)(Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1)-3(Y_i+1)(Y_j+1)(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+2)\\
+&-Y_i(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)+Y_i(2Y_j+3)(Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)\\
+&-Y_i(Y_j+2)(Y_j+3)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+3)+(Y_i+1)(Y_j+2)(Y_j+3)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+3))\\
+&+(Y_j(Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j)+Y_i(Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1)-(Y_j+1)(Y_i+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i+1,Y_j+1))\\
+&((Y_j+2)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+2)-(2Y_j+1)p_{(\mu_{ij},\Sigma_{ij} \mid X)}(Y_i,Y_j+1))]
+\end{align*}
 \end{landscape}
 \section{Application to spatial models}
 \subsection{Spatial models}
