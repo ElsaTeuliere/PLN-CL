@@ -9,9 +9,9 @@
 %\lstset{
 %language=Python,        	% choix du langage : C, Python, R, PHP...
 %basicstyle=\footnotesize\color{mygray},       % taille de la police du code
-%numbers=left,                   % placer les numÃ©ros de lignes Ã  droite (right) ou Ã  gauche (left)
-%numberstyle=\footnotesize,        % taille de la police des numÃ©ros
-%numbersep=7pt,                  % distance entre le code et sa numÃ©rotation
+%numbers=left,                   % placer les num�ros de lignes Ã  droite (right) ou Ã  gauche (left)
+%numberstyle=\footnotesize,        % taille de la police des num�ros
+%numbersep=7pt,                  % distance entre le code et sa num�rotation
 %stepnumber=1,
 %tabsize=4
 %}
@@ -25,8 +25,9 @@
 \usepackage{graphicx}	% Si besoin de bosser sur des images. Si besoin, aller sur le SDZ.
 \usepackage{color}
 \definecolor{mygray}{rgb}{0.2,0.2,0.2}
+\usepackage{xcolor}
 \usepackage{multicol}
-% Les packages pour mettre des expressions un peu mathÃ©matisÃ©es.
+% Les packages pour mettre des expressions un peu math�matis�es.
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -34,6 +35,8 @@
 %\usepackage{mathtools}
 %\usepackage{dsfont}
 \newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+\newcommand{\SR}[2]{\textcolor{gray}{#1}\textcolor{blue}{#2}}
+
 
 \newtheorem{question}{Q}
 \title{	
@@ -41,7 +44,7 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 }
 
 \date{\today}
-\author{Elsa TEULIERE, Stéphane ROBIN}
+\author{Elsa TEULIERE, \SR{St\'ephane ROBIN}{}}
 
 \graphicspath{ {./figures/} }
  
@@ -56,15 +59,40 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 \subsubsection{Moments}
 \subsubsection{Overdispersion}
 \subsection{Variational estimation of the parameters}
+
 \section{Composite likelihood estimation}
 \subsection{Definition and notation}
 \subsubsection{Presentation of the composite likelihood}
 \subsubsection{Composite likelihood for the PLN model}
 \subsection{Consistency}
-
 \subsection{Assymptotic normality}
+\SR{
 \subsection{Calculations and simulations}
+}{}
+
+\SR{}{
+\section{Composite likelihood inference for spatial data}
+\subsection{Poisson log-normal model for spatial data}
+\subsection{Choosing the pairs (?)}
+}
+
+\SR{
 \section{Applications}
-\subsection{•}
+\subsection{-}
 \subsection{Spatial data}
+}{}
+
+\SR{}{
+\section{Illustrations}
+\subsection{Simulations}
+\subsection{'Tiques' data}
+}
+
+\appendix
+\SR{}{
+\section{Appendix}
+\subsection{Derivatives}
+\subsection{...}
+}
+
 \end{document}
