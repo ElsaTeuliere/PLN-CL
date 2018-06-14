@@ -434,10 +434,37 @@ The calculation costs the maximum-likelihood estimators is very high, especially
 Note $\overhat{\sigma_{ij}}$ an estimator of the parameter of covariance $\sigma_{ij}$.
 One have, by a linear model :
 \begin{align*}
-\mathrm{ln}(\overhat{\sigma_{ij}} = mathrm{ln} ( \sigma^2) - \alpha d_ij + E_{ij}
+\mathrm{ln}(\overhat{\sigma_{ij}} = \mathrm{ln} ( \sigma^2) - \alpha d_ij + E_{ij}
 \end{align*}
 With $E_{ij}$ a noise due to estimation. We estime this noise to be  identically distributed  for all the couples considered.
 A classical result gives that the variance of the regression is given by : 
+
+\subsection{Gradient spatial model}
+Since calculation are independant of the coople we choose, we consider one couple of variables, let's say $(Y_i,Y_j)$ for example. The density of the PLN for $(Y_1,Y_2)$ is given by :
+\begin{align*}
+p_{(\mu_{ij},\sigma^2,\alpha \mid X)}(Y_i,Y_j) = \int \int _{\mathbb{R}^2} f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j
+\end{align*}
+With $f_{(e^{\mu_i X + z_i})}(Y_i)$ the density function of a Poisson-law with parameter $e^{\mu_i X + z_i}$ taken in $Y_1$.\\
+\\
+\paragraph{Gradient with respect to $\sigma^2$}
+Derivating under $\int \int$, one have :
+\begin{align*}
+\partial_{\sigma^2} p_{(\mu_{ij},\sigma^2,\alpha \mid X)}(Y_i,Y_j) =\int \int _{\mathbb{R}^2} & f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) \\
+&[-\frac{1}{\sigma^2} + \frac{1}{2} \frac{z_i^2 + z_j^2 - 2 e^{- \alpha d_{ij}} z_i z_j}{(\sigma^2)^2 (1-e^{-2 \alpha d_ij})}] \\
+& \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j
+\end{align*}
+ So we have :
+ \begin{align*}
+ \partial_{\sigma^2} p_{(\mu_{ij},\sigma^2,\alpha \mid X)}(Y_i,Y_j) = &-\frac{1}{\sigma^2}p_{(\mu_{ij},\sigma^2,\alpha \mid X)}(Y_i,Y_j)  \\
+ & - \int \int_{\mathbb{R}^2} f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) z_i \partial_{z_i} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}}  \mathrm{d}z_i \mathrm{d} z_j \\
+ &- \int \int_{\mathbb{R}^2} f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) z_j \partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}}  \mathrm{d}z_i \mathrm{d} z_j
+ \end{align*}
+ From here the idea is to integrate by part the two last terms. We intergrate $\partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}$ and derive $ z_j f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j)$ with respect to $z_j$. If we note $h_{(\alpha, \sigma^2)}(z-i,z_j) =  \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} $, we then get :
+ \begin{align*}
+ - \int \int_{\mathbb{R}^2} f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) z_j \partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j\\
+ = p_{(\mu_{ij},\sigma^2,\alpha \mid X)}(Y_i,Y_j) \\
+  +  \int \int z_j(Y_j f_{(e^{\mu_j X + z_j})}(Y_j) - (Y_j+1) f_{(e^{\mu_j X + z_j})}(Y_j+1)) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j
+ \end{align*}
 \bibliographystyle{plain}
 \bibliography{Biblio.bib}
 \end{document}
