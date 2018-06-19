@@ -1,0 +1,107 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc} 	% L'encodage. Ca peut ÃÂªtre Ã  remplacer par \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\def\ques{\noindent{\bf Question : }}
+\usepackage[english]{babel}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}		% Les marges
+%\usepackage{listings}		% Pour mettre du code dans le fichier, il suffira ensuite d'appeler \begin{lstlisting}
+%\lstset{
+%language=Python,        	% choix du langage : C, Python, R, PHP...
+%basicstyle=\footnotesize\color{mygray},       % taille de la police du code
+%numbers=left,                   % placer les numéros de lignes Ã  droite (right) ou Ã  gauche (left)
+%numberstyle=\footnotesize,        % taille de la police des numéros
+%numbersep=7pt,                  % distance entre le code et sa numérotation
+%stepnumber=1,
+%tabsize=4
+%}
+\usepackage{lscape}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\setcounter{theorem}{0}
+\usepackage{comment} 
+\usepackage{float}
+%\usepackage{capt-of}
+\usepackage{graphicx}	% Si besoin de bosser sur des images. Si besoin, aller sur le SDZ.
+\usepackage{color}
+\definecolor{mygray}{rgb}{0.2,0.2,0.2}
+\usepackage{xcolor}
+\usepackage{multicol}
+% Les packages pour mettre des expressions un peu mathématisées.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+%\usepackage{mathtools}
+%\usepackage{dsfont}
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+\newcommand{\SR}[2]{\textcolor{gray}{#1}\textcolor{blue}{#2}}
+
+
+\newtheorem{question}{Q}
+\title{	
+Composite likelihood inference of the parameters of a Poisson log-normale distribution
+}
+
+\date{\today}
+\author{Elsa TEULIERE}
+
+\graphicspath{ {./figures/} }
+ 
+
+\begin{document}
+\maketitle
+\vspace{1cm}
+\section*{Introduction}
+\section{Poisson log-normal model}
+\subsection{Definitions and notations}
+\subsubsection{The Model}
+\textit{latent gaussian variables, observations law conditionnal to the latent variables,independance}
+\subsubsection{Extension}
+\textit{regression parameters,offset}
+\subsubsection{Interpretation/advantages}
+\textit{dependency in the gaussian latent variables,.... }
+\subsection{Properties}
+\subsubsection{Density function and moments}
+\textit{AiH89-Biometrika}
+\subsubsection{Overdispersion}
+\subsection{Variational estimation of the parameters}
+\textit{\`a travailler PLN/PCA}
+\SR{}{Pour ce passage, il faut faire court en rappelant le principe de VEM et en disant qu'on sait le faire pour PLN.}
+\section{Composite likelihood estimation}
+\subsection{Definition and notation}
+\subsubsection{Presentation of the composite likelihood}
+\textit{VRF11-StatSinica}
+\subsubsection{Composite likelihood for the PLN model}
+\textit{Expression, definition of the $\Sigma_{ij},\mu_{ij}$, \'equivalence des couples}
+\subsection{Consistency}
+\subsubsection{M-estimator theory}
+\textit{chap.5 Assymptotic Statistics van der Vaart}
+\subsubsection{Consistency of the composite likelihood for the PLN model}
+\textit{proof}
+\subsection{Assymptotic normality}
+\subsubsection{M-estimator theory}
+\textit{chap.5 Assymptotic Statistics van der Vaart}
+\subsubsection{Assymptotic normality of the composite likelihood for the PLN model}
+\textit{proof}
+\subsubsection{Construction of assymptotic statistic tests (?)}
+\textit{Peut-etre trop scolaire...} \SR{}{Je suis d'accord. Il suffit de dire que la normalite asymptotique nous donne les intervalles de confiance (asymptotiques) et les tests (asymptotiques)}
+
+\section{Composite likelihood inference for spatial data}
+\subsection{Poisson log-normal model for spatial data}
+\subsubsection{One specie\SR{}{s} \SR{(meme au singulier)}{}, spatial dependency}
+\subsubsection{spatial parametrisation of the PLN}
+\subsection{Computational optimisation by taking a sparce CL}
+
+\section{Illustrations}
+\subsection{Simulations}
+\subsection{'Tiques' data}
+
+\appendix
+\section{Appendix}
+\subsection{Gradients}
+\subsection{Hessian}
+\subsection{Spatial gradient and hessian}
+
+
+\end{document}

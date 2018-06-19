@@ -54,13 +54,37 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 \vspace{1cm}
 \section*{Introduction}
 \section{Poisson log-normal model}
+The Poisson log normal model was developped by Aitchison \textit{et al.}\cite{aitchison1989multivariate}, to modell multivariate count data.  The idea is to introduce latent gaussian variables encoding the dependency between the variables. In this section we introduce this model and our notation and briefly review the existing litterature on this model.
 \subsection{Definitions and notations}
-\subsubsection{The Model}
-\textit{latent gaussian variables, observations law conditionnal to the latent variables,independance}
-\subsubsection{Extension}
-\textit{regression parameters,offset}
-\subsubsection{Interpretation/advantages}
-\textit{dependency in the gaussian latent variables,.... }
+We note $\mathcal{N}(p,Q)$ the multivariate normale distribution of mean $p$ and variance-covariance $Q$, and $\mathcal{P}(\alpha)$ the Poisson-distribution of mean $\alpha$.
+\subsubsection{The Model} 
+We consider $(\mu,\Sigma) \in \mathbb{R}^n \times \mathcal{M}_n(\mathbb{R})$, with $\Sigma$ a symetric non negative matrix, the parameters of the model.\\
+We consider the latent variables $Z \sim \mathcal{N}(0,\Sigma)$.\\
+Multivariate count data $(Y_1,...,Y_n)$ follow a Poisson log-normal model of mean $\mu$ and matrix of variance-covariance $\Sigma$ if :
+\begin{center}
+$\forall i \in \{1,...n\}, Y_i \mid Z_i \sim \mathcal{P}(e^{\mu_i+Z_j})$
+\end{center}
+and 
+\begin{center}
+$\forall (i,j) \in \{1,...,n\}^2$, $ Y_i\mid Z_i$ and $Y_j\mid Z_j$ independant.
+\end{center}
+
+We typically consider $N$ independant sampling experiment of $n$ variables each time, for example the case of sampling $n$ species over $N$ sites. In our notations, the exposant allways stands for the sampling experiment, and the underscore stand for the observed variable.\\
+So we now have $(Z^j)_{j \in \mathbb{N}}$ latent variables, independant and identically distributed : $\forall j \in \{1,...,N}$, $Z^j \sim \mathcal{N}(0,\Sigma)$, and :
+\begin{center}
+$\forall (i,j) \in \{1,...,n\} \times \{1,...,N\}$, $Y^j_i \mid Z^j_i \sim \mathcal{P}(e^{\mu_i+Z^j_i})$.
+\end{center}
+The advantage of this model is that all the dependance structure is encoded through gaussian variables.
+\subsubsection{Extension accounting for covariates and offset}
+In multivariate data, the dependency can occur through covariates. As developped in \cite{chiquet2017variational}, we will postulate the existence of a linear regression in  the parameters space. \\
+\\
+In this case, we consider a vector $X^j \in \mathbb{R}^d$ of covariates (collected for each sampling). Let $M$ be a $d \times n$ Matrix, called the matrix of regression parameters. We note $\mu^i$ the $i^{th}$ column of the matrix M. We can also add one offset parameter per observation $O^j_i$. The offset, can typically be the sampling effort. In this case the Poisson log-normal model is given by :
+\begin{center}
+$\forall (i,j) \in \{1,...,n\} \times \{1,...,N\}$, $Y^j_i \mid Z^j_i \sim \mathcal{P}(e^{O^j_i + X_j^T \mu^i +Z^j_i})$ 
+\end{center}
+The set of parameters, that we aim to estimate is now given by $(M,\Sigma) \in \mathcal{M}_{d \times n}(\mathbb{R}) \times \mathcal{M}_{n}(\mathbb{R})$.\\
+\\
+This model enable us to take in account for fixed additional effects. Indeed, it can help to interpret the dependency parameters. For examples, 	Poisson log-normal model can be used to estimate an interaction network from the co-occurancy. With this model, we can hope, with a good choice of the covariables, that the dependencies encoded in the variance-covariance matrix $\Sigma$ will indicate the interraction between species.
 \subsection{Properties}
 \subsubsection{Density function and moments}
 \textit{AiH89-Biometrika}
