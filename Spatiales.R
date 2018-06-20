@@ -278,3 +278,172 @@ Estimateurs_esp_corr<-function(param,Yobs,Xobs,Oobs){#On va calculer la moyenne 
   }
   return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
 }
+
+
+####################################################################################################################
+## Composite likelihood du modèle spatial
+
+#Fonction qui renvoie la matrice de variance-covariance à partir des distances, alpha et sigma
+var_cov_spatial<-function(points_x,points_y,alpha,sigma){
+  p=length(points_x)
+  var=matrix(0,p,p)
+  for(i in 1:(p-1)){
+    for (j in (i+1):p){
+      var[i,j]<-exp(-alpha*sqrt((points_x[i]-points_x[j])^2 + (points_y[i]-points_y[j])^2))
+    }
+  }
+  var<-var+t(var)
+  diag(var)<-rep(1,p)
+  return(sigma*var)
+}
+
+
+
+n=100
+nb_simu=250
+p=5
+d=3
+O=matrix(1,n,p)
+X=matrix(runif(n,-1,1),n,1)
+if(d>1){
+  for (j in 1:(d-1)){
+    X<-cbind(X,runif(n,-1,1))
+  }
+}
+mu<-runif(p*d,0,1)
+alpha=5
+sigma=3
+#On simule les distances
+points_x=runif(p,-1,1)
+points_y=runif(p,-1,1)
+
+var=matrix(0,p,p)
+Var_Cov=var_cov_spatial(points_x,points_y,alpha,sigma)
+param<-c(mu,diag(Var_Cov))
+for (j in 1:(p-1)){
+  for (k in (j+1):p){
+    a=Var_Cov[j,k]
+    param=c(param,a)
+  }
+}
+
+Obs_3=Observations_simulees_bis(n,p,X,O,param)
+
+#On trace d'abord la composite likelihood par rapport au parametre sigma :
+abscisse=seq(1,5,length=10)
+ordonnees=c()
+for (k in 1:length(abscisse)){
+  vc=var_cov_spatial(points_x,points_y,alpha,abscisse[k])
+  param_profil<-c(mu,diag(vc))
+  for (j in 1:(p-1)){
+    for (k in (j+1):p){
+      a=vc[j,k]
+      param_profil=c(param_profil,a)
+    }
+  }
+  ordonnees= c(ordonnees,CL_f(param_profil,Obs_3,O,X))
+}
+plot(abscisse,ordonnees)
+title("CL wrt sigma (sigma=3)")
+
+#On trace de même pour alpha
+abscisse=seq(0.5,10,length=20)
+ordonnees=c()
+for (k in 1:length(abscisse)){
+  vc=var_cov_spatial(points_x,points_y,abscisse[k],sigma)
+  print(vc)
+  param_profil<-c(mu,diag(vc))
+  for (j in 1:(p-1)){
+    for (i in (j+1):p){
+      a=vc[j,i]
+      param_profil=c(param_profil,a)
+    }
+  }
+  print(param_profil)
+  ordonnees= c(ordonnees,CL_f(param_profil,Obs_3,O,X))
+}
+plot(abscisse,ordonnees)
+title("CL wrt alpha (alpha=5)")
+
+#####################################################################################################################################
+## Optimisation sans gradient 
+
+##################################################################################################################################
+##Optimisation par une méthode sans gradients
+
+#Simulation des paramètres
+p=5
+d=2
+n=50
+nb_simu=250
+O=matrix(1,n,p)
+X=matrix(runif(n,-1,1),n,1)
+if(d>1){
+  for (j in 1:(d-1)){
+    X<-cbind(X,runif(n,-1,1))
+  }
+}
+mu<-runif(p*d,0,1)
+#On simule les distances
+points_x=runif(p,-1,1)
+points_y=runif(p,-1,1)
+
+Var_Cov=var_cov_spatial(points_x,points_y,alpha,sigma)
+param<-c(mu,diag(Var_Cov))
+for (j in 1:(p-1)){
+  for (k in (j+1):p){
+    a=Var_Cov[j,k]
+    param=c(param,a)
+  }
+}
+
+
+param_estim=c()
+param_estim_norm=c()
+diff_hessian=c()
+##Simulation des observations
+for (k in 1:nb_simu){
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  x_0=param_0(Obs_3,O,X)
+  x_init=c(x_0[1:(p*d)]) #PLN ne nous sort pas le modèle spatialisé. L'idée est donc d'approcher sigma et alpha. 
+  #Pour sigma on fait la moyenne des variances (cf ci-dessous)
+  #Pour alpha on fait :
+  var_es<-c()
+  compteur=1
+  for (i in 1:(p-1)){
+    for(j in (i+1):p){
+      var_es<-c(var_es,-log(abs(x_0[p*d+p+compteur]/mean(x_0[(p*d+1):(p*d+p)])))*(1/ sqrt((points_x[i]-points_x[j])^2+(points_y[i]-points_y[j])^2)) )
+      compteur= compteur+1
+    }
+  }
+  x_init=c(x_init,mean(var_es),mean(x_0[(p*d+1):(p*d+p)]))
+  ##paramètres de optim
+  ctrl <- list(ftol_rel = ifelse(n < 1.5*p, 1e-6, 1e-8), ftol_abs = 0,
+               xtol_rel = 1e-4, xtol_abs = 1e-4, maxeval = 10)
+  opts <- list("maxit"=40)
+  fonction_a_optimiser<-function(param){
+    mu=param[1:(p*d)]
+    alpha=param[p*d+1]
+    sigma=param[p*d+2]
+    Var_Cov=var_cov_spatial(points_x,points_y,alpha,sigma)
+    param_CL<-c(mu,diag(Var_Cov))
+    for (j in 1:(p-1)){
+      for (i in (j+1):p){
+        a=Var_Cov[j,i]
+        param_CL=c(param_CL,a)
+      }
+    }
+    return(neg_CL(param_CL,Obs_3,O,X))
+  }
+  ##Optimisation avec optim
+    param_optimaux<-optim(par=x_init,fn=fonction_a_optimiser,method = "SANN",hessian = TRUE, control=opts)
+    param_estim=rbind(param_estim,param_optimaux$par)
+    V_inf=Estimateurs_esp(param_optimaux$par,Obs_3,X,O)
+    Vp_inf=ginv(param_optimaux$hessian)
+    Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
+    param_estim_norm<-rbind(param_estim_norm,(param_optimaux$par-param)/sqrt(diag(Godambe)))
+}
+E=data.frame(param_estim_norm)
+E_prime=melt(E)
+pltt<-ggplot(data=E_prime,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
+  theme_bw()

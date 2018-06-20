@@ -13,6 +13,8 @@ Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramÃ¨tres d et p pour Ã
   Rho=matrix(0,nrow=p,ncol=p)
   Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
   Rho=t(Rho)
+  diag(Rho)<-Sigma
+  Rho=cov2cor(Rho)
   Xmu=O+X%*%Mu
   
   #On commence par calculer tous les termes dont on aura besoin 
@@ -176,7 +178,8 @@ return(list(hess_mat,gradCL_calc))
    Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
    Rho=t(Rho)
    Xmu=O+X%*%Mu
-   
+   diag(Rho)<-Sigma
+   Rho=cov2cor(Rho)
    #On commence par calculer tous les termes dont on aura besoin 
    terms<-matrix(0,5*p,5*p)
    for(j in 2:p){

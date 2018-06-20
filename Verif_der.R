@@ -201,8 +201,8 @@ for (k in 1:nb_simu){
 }
 temps_moyen[[length(temps_moyen)+1]]<-tps/c
 name_table=paste(c('values',as.character(p),as.character(d),"_new"), collapse = "")
-name_table_norm=paste(c('values',as.character(p),as.character(d),"_norm_new"), collapse = "")
-name_graph=paste(c('graph',as.character(p),as.character(d),"_new"), collapse = "")
+name_table_norm=paste(c('values',as.character(p),as.character(d),"_norm_corr"), collapse = "")
+name_graph=paste(c('graph',as.character(p),as.character(d),"_corr"), collapse = "")
 write.table(param_estim_norm, file = paste(c("/home/teuliere/PLN-Cl/",name_table_norm),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
             eol = "\n", na = "NA", dec = ".", row.names = TRUE,
             col.names = TRUE, qmethod = c("escape", "double"))

@@ -32,11 +32,12 @@ CL_f<-function(param,Y,O,X){
   Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
   Rho=t(Rho)+Rho+diag(Sigma,p,p) #matrice de variance/covariance
   Xmu=O+X%*%Mu
+  Corr=cov2cor(Rho)
   CL<-0
   for(i in 1:n){
     for (j in 1:(p-1)){
       for (k in (j+1):p){
-        CL<-CL+log(dbipoilog(Y[i,j],Y[i,k],mu1=Xmu[i,j],mu2=Xmu[i,k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Rho[j,k]))
+        CL<-CL+log(dbipoilog(Y[i,j],Y[i,k],mu1=Xmu[i,j],mu2=Xmu[i,k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Corr[j,k]))
       }
     }
   }
@@ -50,10 +51,11 @@ CL_f_uni<-function(param,Y,O,X,d,p,Xmu,Sigma,Rho){
   Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
   Rho=t(Rho)+Rho+diag(Sigma,p,p) #matrice de variance/covariance
   Xmu=O+X%*%Mu
+  Corr=cov2cor(Rho)
   CL<-0
   for (j in 1:(p-1)){
     for (k in (j+1):p){
-      CL<-CL+log(dbipoilog(Y[j],Y[k],mu1=Xmu[j],mu2=Xmu[k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Rho[j,k]))
+      CL<-CL+log(dbipoilog(Y[j],Y[k],mu1=Xmu[j],mu2=Xmu[k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Corr[j,k]))
     }
   }
   return(CL)
@@ -116,14 +118,22 @@ grad_CL_f<-function(param,Y,O,X){
 }
 
 grad_CL_uni<-function(Y,X,O,d,p,Xmu,Sigma,Rho){
+  #Fonction qui calcule le gradient pour une observation.
+  ##Y est le vecteur des observations
+  ##X est le vecteur des covariables
+  ##O est le vecteur des offsets
+  ##Xmu est la combinaison des covariables et facteurs de régression
+  ## Sigma est le vecteur des variances
+  ## Rho est la matrice des variances convariances
   #On commence par calculer tous les termes dont on a besoin 
   terms<-matrix(0,3*p,3*p)
+  Corr=cov2cor(Rho)
   for(j in 2:p){
     for (k in 1:(j-1)){
       for (l in 1:3){
         for (m in 1:3){
           if (l+m<5){
-            terms[(3*(k-1)+l),(3*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Rho[k,j])
+            terms[(3*(k-1)+l),(3*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Corr[k,j])
           }
         }
       }
@@ -165,6 +175,7 @@ grad_CL_uni<-function(Y,X,O,d,p,Xmu,Sigma,Rho){
 
 
 grad_CL_opt<-function(param,Y,O,X){
+  #Le vecteur param contient tous les paramètres dans l'ordre suivant : coefficents de régression, variances, covrariances
   n=nrow(Y)
   p=ncol(Y)
   d=ncol(X)
@@ -173,6 +184,7 @@ grad_CL_opt<-function(param,Y,O,X){
   Rho=matrix(0,nrow=p,ncol=p)
   Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
   Rho=Rho+t(Rho)
+  diag(Rho)<-Sigma #Rho est ici une matrice de variance-covariance
   Xmu=O+X%*%Mu
   grad_CL=rep(0,length(param))
   for (i in 1:n){#On répète sur les observations
@@ -227,7 +239,7 @@ Observations_simulees_bis<-function(n,p,X,O,param){
 param_0<-function(Y,O,X){ #Fonction pour trouver les paramètres initiaux à partir de la vem
   p=ncol(Y)
   Model<-PLN(Y~-1+X+offset(O))
-  Sigma=Model$model_par$Sigma
+  Sigma=Model$model_par$Sigma #Matrice de variance-covariance
   param=c(Model$model_par$Theta,diag(Sigma))
   for (j in 1:(p-1)){
     for (k in (j+1):p){
