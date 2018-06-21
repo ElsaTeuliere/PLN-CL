@@ -140,6 +140,88 @@ for (j in 1:nb_simu){
 }
 
 
+#####################################################################################################
+##En calculant Godambe avec les bonnes observations
+######################################################################################################
+
+n=100
+nb_simu=250
+p=5
+d=3
+O=matrix(1,n,p)
+X=matrix(runif(n,-1,1),n,1)
+if(d>1){
+  for (j in 1:(d-1)){
+    X<-cbind(X,runif(n,-1,1))
+  }
+}
+mu<-runif(p*d,0,1)
+Var_Cov<-var_cov(p)
+param<-c(mu,diag(Var_Cov))
+for (j in 1:(p-1)){
+  for (k in (j+1):p){
+    a=Var_Cov[j,k]
+    param=c(param,a)
+  }
+}
+temps_moyen<-list()
+nombre_iterations<-list()
+param_estim=c()
+param_estim_norm<-c()
+c=0
+tps<-0
+grad_sortie_PLN<-c()
+grad_sortie_nloptr<-c()
+for (k in 1:nb_simu){
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  b_time<-Sys.time()
+  x_0=param_0(Obs_3,O,X)
+  lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
+  ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1)))
+    grad_sortie_PLN<-c(grad_sortie_PLN,norme_L2(grad_CL_opt(x_0,Obs_3,O,X)))
+    param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
+                           lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1))), ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1))),
+                           opts=opts, Y=Obs_3, X=X,O=O)
+    param_estim=rbind(param_estim,param_optimaux$solution)
+    grad_sortie_nloptr<-c(grad_sortie_nloptr,norme_L2(grad_CL_opt(param_optimaux$solution,Obs_3,O,X)))
+    c<-c+1
+    nombre_iterations[length(nombre_iterations)+1]<-param_optimaux$iter
+    V_inf=Estimateurs_esp_corr(param_optimaux$solution,Obs_3,X,O)
+    hess=symetrisation(V_inf[[1]])
+    A=diag(hess)
+    hess_ok=hess+t(hess)-diag(A)
+    Vp_inf=ginv(hess_ok)
+    Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
+    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$solution-param))/sqrt(diag(Godambe)))
+    tps<-tps+(Sys.time()-b_time)
+}
+temps_moyen[[length(temps_moyen)+1]]<-tps/c
+name_table=paste(c('values',as.character(p),as.character(d),"_new"), collapse = "")
+name_table_norm=paste(c('values',as.character(p),as.character(d),"_norm_corr"), collapse = "")
+name_graph=paste(c('graph',as.character(p),as.character(d),"_corr"), collapse = "")
+write.table(param_estim_norm, file = paste(c("/home/teuliere/PLN-Cl/",name_table_norm),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
+            eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+            col.names = TRUE, qmethod = c("escape", "double"))
+write.table(param_estim, file = paste(c("/home/teuliere/PLN-Cl/",name_table),collapse=""), append = FALSE, quote = TRUE, sep = "\t",
+            eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+            col.names = TRUE, qmethod = c("escape", "double"))
+E_20=read.table(name_table_norm,sep="\t",header = TRUE)
+E_202=melt(E_20)
+plt<-ggplot(data=E_202,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
+  theme_bw()
+png(paste(name_graph,".png",sep=""),width=1000, height=800,res=110)
+print(plt)
+dev.off()
+
+E=read.table(name_table,sep="\t",header=TRUE)
+for (i in 1:nb_simu){
+  E[j,]<-E[j,]-param
+}
+E_prime=melt(E)
+pltt<-ggplot(data=E_prime,aes(x=value))+geom_histogram()+facet_wrap(~variable,scales="free")+
+  theme_bw()
+print(pltt)
+
 
 
 

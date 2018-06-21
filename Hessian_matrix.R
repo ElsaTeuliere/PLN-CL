@@ -314,7 +314,7 @@ return(list(hess_mat,gradCL_calc))
      Esp_hess<-Esp_hess+objets[[1]]
      Esp_gradCL<-Esp_gradCL+objets[[2]]%*%t(objets[[2]])
    }
-   return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
+   return(list((1/n)*E,(1/n)*Esp_gradCL))
  }
 ##Test
 param=c(2,1.5,1,1,-0.5)
