@@ -153,7 +153,8 @@ With this simple expression of the pairwise density function, we can write the c
 \begin{align}
 \mathcal{CL}_{(Y^1,...,Y^N,O)}(M,\Sigma \mid X) = \prod_{j=1}^N \prod_{1 \leq i < k \leq n}  h'_{(M^{(ik)},\Sigma^{(ik)} \mid X^j,O^j)}(Y^j_i,Y^j_k)
 \end{align}
-With $h'$ the pairwise density function defined as above , $M^{(ik)}$ the matrix constituted of the $i$-th and $k$-th row of M and  $\Sigma^{(ik)}  = \begin{pmatrix}
+With $h'$ the pairwise density function defined as above , $M^{(ik)}$ the matrix constituted of the $i$-th and $k$-th row of M and 
+$\Sigma^{(ik)}  = \begin{pmatrix}
 \sigma_{ii} & \sigma_{ik}\\
 \sigma_{ik} & \sigma_{kk}\\
 \end{pmatrix}$
@@ -162,25 +163,136 @@ For easier calculation, we take the log composite likelihood given by :
 \mathcal{CL}_{(Y^1,...,Y^N,O)}(M,\Sigma \mid X) = \sum_{j=1}^N \sum_{1 \leq i < k \leq n}  \mathrm{log}(h'_{(M^{(ik)},\Sigma^{(ik)} \mid X^j,O^j)}(Y^j_i,Y^j_k))
 \end{align*}
 There exists some theoretical results about the consistency of the method of maximisation of the composite likelihood. In the next section we show that the pariwise log-composite likelihood, is an M-estimator and so all the theory developped for M-estimators \cite{vaart_1998} can be applied.
-\subsection{Consistency}
-\subsubsection{M-estimator theory}
+\subsubsection{M-estimator and composite likelihood}
 \begin{definition}
 Let $(Y^1,...Y^N) \in \mathcal{X}^N$ be a set of observations. Let $\theta$ be an unknown parameter. \\
-$\overhat{\theta}_N(Y^1,...Y^N)$ is called an M-estimator of $\theta$ if it maximize a function :
+$\widehat{\theta}_N(Y^1,...Y^N)$ is called an M-estimator of $\theta$ if it maximize a function :
 \begin{align*}
 \mathcal{M}_N : \theta \mapsto \frac{1}{N} \sum_{i=1}^N m_\theta(Y^i)
 \end{align*}
-with $m_\theta : \mathcal{X} \rightarrow \mathbb{R}$ a known function.
+with, for all $\theta \in \Theta$, $m_\theta : \mathcal{X} \rightarrow \mathbb{R}$ a known function.
 \end{definition}
+Since the $\frac{1}{N}$ factor in the M-estimator doesn't modify the location of the maximum, we can also define the M-estimator as the parameter miximizing a function $\mathcal{M}_N : \theta \mapsto  \sum_{i=1}^N m_\theta(Y^i)$.\\
+\\
+In the case of the composite likelihood, for all $\theta \in \Theta$, we set 
+\begin{center}
+$\begin{array}{ccccc}
+m_\theta & : & \mathcal{X} & \to & \mathbb{R} \\
+ & & Y^j & \mapsto & \sum_{0 \leq i<k \leq n} \mathrm{log} (h'_{(M^{(ik)},\Sigma^{(ik)}}(Y^j_i,Y^j_k) \\
+\end{array}$
+\end{center}
+The estimator constructed by maximizing the pairwise composite likelihodd is an M-estimator. We will apply the theory developped for M-estimators to prove the consistency and assymptotic normality of the estimator.
+\subsection{Consistency}
+\subsubsection{Consistency of M-estimators}
+\begin{theorem} \label{ThMest} \cite{vaart_1998}
+Let $(\mathrm{M}_N)$ be a random sequence of functions in the variable $\theta$ and $M$ a determinist function in the variable $\theta$. If :
+\begin{enumerate}
+\item $\underset{\theta \in \Theta}{\mathrm{sup}} \mid \mathrm{M}_N(\theta)-\mathrm{M}(\theta) \mid \overset{\mathbb{P}}{\longrightarrow} 0$
+\item the maximum $\theta^\ast$ of M is unique.
+\end{enumerate}
+Then any sequence of estimators $\widehat{\theta}_N$ with $\mathrm{M}_N(\widehat{\theta}_N) \geq \mathrm{M}_N(\theta^\ast)-\circ_p(1)$ converges in probability to $\theta^\ast$.
+\end{theorem}
+\begin{proof}
+Let $M_N$ a random sequence of function, $M$ a determinist function with a unique maximum $\theta^*$ and $\widehat{\theta}_N$ be a sequence of estimators satisfying the conditions of the theorem \ref{ThMest}.
+
+We want to proove that :
+\begin{center}
+$\forall \epsilon > 0$, $\mathbb{P}(\{\mathrm{d}(\widehat{\theta}_N,\theta*)>\epsilon\})\underset{ N \rightarrow + \infty}{\longrightarrow} 0$
+\end{center}
+Let consider $\epsilon >0$. By assumption, $\theta ^*$ is the unique maximum of the function $M$, so $\underset{ \theta : \mathrm{d}(\theta,\theta^*)}{\mathrm{sup}}(M(\theta)) < M(\theta^*)$. In particular, there exists $\eta > 0$ so that : $\forall \theta \in \Theta$, $\mathrm{d}(\theta,\theta^*)>\epsilon$, $M(\theta) < M(\theta^*)-\eta$.\\
+Consequently, the probabilist event $\{\mathrm{d}(\widehat{\theta}_N,\theta^*)> \epsilon\}$ is included in the event $\{M(\widehat{\theta}_N)<M(\theta^*)-\eta\}$. We will show that the probability of this event converges to zero when $N$ tends to infinity.\\
+The assumption of uniform convergence of the sequence of functions $M_N$  to $M$ ensures that $M_N(\theta^*) \overset{\mathbb{P}}{\longrightarrow} M(\theta^*)$. Indeed, by assumption $M_N( \widehat{\theta}_N) \geq M_N(\theta^*)- \circ_\mathbb{P}(1)$, so we deduce that $M_N( \widehat{\theta}_N)+ \circ_\mathbb{P}(1) \geq M(\theta^*)$.
+We now deduce that :
+\begin{align*}
+M(\theta^*)-M(\widehat{\theta}_N) & \leq \widehat{\theta}_N)+ \circ_\mathbb{P}(1)-M(\widehat{\theta}_N)\\
+& \leq \underset{\theta}{\mathrm{sup}} \mid M_N-M \mid (\theta) + \circ_\mathbb{P}(1)
+\end{align*}
+This is sufficient to conclude since for all $\eta > 0$, $\mathbb{P} ( \mid M(\theta^*)-M(\widehat{\theta}_N)\mid > \eta) \underset{ N \rightarrow + \infty} {\longrightarrow} 0$.
+\end{proof}
 \subsubsection{Consistency of the composite likelihood for the PLN model}
-\textit{proof}
+The estimator of the parameters $M$ and $\Sigma$ of a Poisson log-normale model constructed by maximizing the composite likelihood is consistent. We show this result in two steps. We first show that for a Poisson log-normal model in dimesion two, the maximum-likelihood estimator is consistent before generalizing to $n$-dimensional PLN models.
+
+\paragraph{In dimension 2} :
+\begin{theorem} \label{Consistence_2}
+For each $(i,k) \in \{1...n\}^2$, $i \neq k$, the estimator $(\widehat{M}^{(ik)}_N,\widehat{\Sigma}^{(ik)}_N)$ constructed by maximizing the log-likelihood of the couple $(Y^j_i,Y^j_k)_{j \in \{1...N\}}$, given by $\sum_{i=1}^{N} \mathrm{log}(p_{(M^{(ik)},\Sigma^{ik} \mid X)}(Y^j_i,Y^j_k))$, is a consistent estimator of the correlation coefficients $M^{(ik)}$ and of the variance-covariance matrix $\Sigma^{(ik)}$.
+\end{theorem}
+\begin{proof}
+
+The idea of this proof is to use the theorem \ref{ThMest} for our composite likelihood. The proof will  follow four steps to verify that the assumptions of the theorem are verified. We will first show the convergence in probability of our M-estimator to a function $\mathrm{M}_{(M^{ik},\Sigma^{ik})}$. Then we proove the existence of a unique maximum for this function $\mathrm{M}$. To do this we need two steps : at first we show that our model is identifiable and then, using the Kullback-divergence, that it has a maximum. Combining this two steps will allow us to conclude the existence of a unique maximum. In the last part, we conclude, using the theroem \ref{ThMest} on the consistence of the estimator. \\
+\\
+\textbf{Step 1 :} Convergence in probability.\\
+Using the large number low, we do have that $\frac{1}{N} \sum_{i=1}^{N} \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y^j_i,Y^j_k))$ converge almost surely to $\mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[ \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]]$. So we set $\mathrm{M}(M^{(ik)}, \Sigma^{(ik)}) =\mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[ \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]]$. \\
+\\
+\textbf{Step 2 :} Identifiability of the model.\\
+ We use the general definition of identifiability \cite{rivoirard}, namely that the family of probabilities $\mathcal{P}=\{\mathbb{P}_\theta,\theta \in \Theta\}$ is identifiable if the application $ \theta \mapsto \mathbb{P}_\theta$ is injective.
+ In our case $\mathcal{P}=\{(\mathcal{PLN}_X (M,\Sigma))_{X \in \mathcal{X}}; (\mu, \Sigma) \in  \mathcal{M}_{d \times n}(\mathbb{R}) \times \mathcal{M}_n(\mathbb{R})\}$. To show the identifiability of the model we will use the fact that two variables having the same distribution have the same moment. Consider $(M^{(ik)},\Sigma^{(ik)}) \in \mathcal{M}_{d\times 2}(\mathbb{R}) \times \mathcal{M}_2(\mathbb{R})$ and $(M'^{(ik)},\Sigma'^{(ik)}) \in \mathcal{M}_{d\times 2}(\mathbb{R}) \times \mathcal{M}_2(\mathbb{R})$, so that  for every vector of covariables $X \in \mathcal{X}$,$\mathcal{PLN}_X(M^{(ik)},\Sigma^{(ik)})\sim\mathcal{PLN}_X(M'^{(ik)},\Sigma'^{(ik)})$ . We have :
+ \begin{equation}
+ \mathbb{E}_{(M^{(ik)},\Sigma^{(ik)} \mid X)}[Y_i]=\mathbb{E}_{(M'^{(ik)},\Sigma'^{(ik)} \mid X)} [Y_i] 
+ \end{equation}
+\begin{equation}
+ \mathrm{Var}_{(M^{(ik)},\Sigma^{(ik)} \mid X)}[Y_i]=\mathrm{Var}_{(M'^{(ik)},\Sigma'^{(ik)} \mid X)} [Y_i] \\
+\end{equation}
+\begin{equation}
+ \mathrm{Cov}_{(\mu^{(ik)},\Sigma^{(ik)} \mid X)}[Y_i,Y_k]=\mathrm{Cov}_{(M'^{(ik)},\Sigma'^{(ik)} \mid X)} [Y_i,Y_k]
+\end{equation}
+Using the formula of this moment we recall in the presentation of the model, we find that $\sigma_{ii} = \sigma'_{ii}$, $\sigma_{ik}=\sigma'_{ik}$ and $X (M^i-M'^i)=0$. The last condition has to be true for any vector of covariable $X$. We deduce from this that,  we expect $\mathcal{X}^\perp = \{0\}$ for the model to be identifable, \textit{ie.} that $\mathrm{rg}(\mathcal{X})=d$.\\
+\\
+\textbf{Step 3 :} Existence of a unique maximum for the function $\mathrm{M}$.\\
+What we consider is nothing else than the log-likelihood of two variables with a Poisson-log-normale distribution. We just shew that the model is identifiable. So there exist one and only one set of parameters $(M^{(ik)}^\ast, \Sigma^{(ik)}^\ast)$ such that $(Y_j,Y_k) \sim \mathcal{PLN}_X(M^{(ik)}^\ast,\Sigma_{(ik)}^\ast)$. We first can show that maximizing the log-likelihood is equivalent to minimize the Kullback divergence. We recall that the Kullback divergence for two distributions of density functions $p_\theta$ a,d $p_{\theta^\ast}$ is given by $\mathrm{D_{KL}}(p_{\theta^\ast} \parallel p_{\theta})= \int p_{\theta^\ast}(x) \mathrm{log}(\frac{p_{\theta^\ast}(x)}{p_{\theta}(x)}) \mathrm{d}x$. Since we have :
+\begin{align*}
+\mathbb{E}_X[\mathbb{E}_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}&[\mathrm{log}(h_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}(Y_i,Y_k)) - \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_j,Y_k))]] \\
+& = \mathbb{E}_X[\mathrm{D_{KL}}(h_{(\mu_{jk}^\ast,\Sigma_{jk}^\ast \mid X)}\parallel h_{(\mu^{(ik)},\Sigma^{(ik)} \mid X)})]\\
+& = \mathbb{E}_X[\mathbb{E}_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}[\mathrm{log}(h_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}(Y_i,Y_k))]] - \mathrm{M}(M^{(ik)},\Sigma^{(ik)})
+\end{align*}
+ Since the Kullback-divergence is always positive, we see that maximizing the log-likelihood is equivalent to minimize the Kullback-divergence. The Kullback-divergence is only zero if the two distributions are the same. So we see that the M function is maximum for $(M^{(ik)},\Sigma^{(ik)})=(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast)$. So we can conclude that the function M only has one maximum, and this maximum is obtained for the parameters we are interested in.\\
+\\
+\textbf{Step 4 :} Conclusion.\\
+To summurize we have :
+\begin{enumerate}
+\item By the convergence almost surely :
+\begin{center}
+ $\underset{(M^{(ik)},\Sigma^{(ik)})}{\mathrm{sup}} \mid \frac{1}{N} \sum_{j=1}^{N} \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y^j_i,Y^j_k)) - \mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]] \mid \overset{\mathbb{P}}{\longrightarrow} 0 $ 
+ \end{center}
+\item The function $(M^{(ik)},\Sigma^{(ik)})\mapsto \mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]] $ only has one maximum for $(M^{ik},\Sigma^{(ik)})=(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast)$, the parameters of the Poisson-log-Normale distribution of the variables $(Y_i,Y_k)$.
+\end{enumerate}
+Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{M}^{(ik)}_N, \widehat{\Sigma}^{ik}_N)_{N \in \mathbb{N}}$ converges in probability to what we hope to approximate, namely $(M^{(ik)}^\ast, \Sigma^{(ik)}^\ast$).
+\end{proof}
+
+\paragraph{In dimension $n$}
+\begin{theorem}
+The estimator $(\widehat{M}_N,\widehat{\Sigma}_N)$ constructed by maximizing the composite pairwise likelihood for $(Y^j_1,...Y^j_n)_{j \in \{1...N\}}$ is a consistent estimator of the correlation coefficients $M$ and of the matrix of variance-covariance $\Sigma$.
+\end{theorem}
+
+\begin{proof}
+The proof follows exactly the same path that we did for a couple of variables. We will again use theorem \ref{ThMest} and the results of theorem \ref{Consistence_2}.\\
+\\
+\textbf{Step 1 :} Convergence in probability.
+Again using the large number law we have :\\
+ $\frac{1}{N}\sum_{i=1}^{N} \sum_{j<k} log(p_{(M^{(ik)},\Sigma^{(ik)} \mid X)} (Y^j_i,Y^j_k) \overset{\mathbb{P}}{\longrightarrow} \sum_{j<k}\mathbb{E}_X [\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(p_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]]$.\\
+ We note M the function $\mathrm{M} : (M, \Sigma) \mapsto \sum_{j<k}\mathbb{E}_X [\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(p_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]]$.\\
+ \\
+ \textbf{Step 2 :} Identifiability of the model.\\
+The family of model we consider here is $\mathcal{P}=\{ (\mathcal{PLN}_X(\mu,\Sigma))_{X \in \mathcal{X}}; M \in \mathcal{M}_{d \times n}(\mathbb{R}), \Sigma \in \mathcal{M}_n(\mathbb{R})\}$. Using the moment as we did with a Poisson log-normale distribution of a vector of two variables, but this time for n variables is sufficient to show the identifiability of the model.\\
+\\
+\textbf{Step 3 :} Existence and uniqueness of the maximum for the function M.\\
+Again here we have by the identifiability of the model, under the assumption that the data follow a Poisson log-normale distribution, that there exist one and only one set of parameters $(M^\ast, \Sigma^\ast)$ such as given a vector of covariables $X$, $(Y^j) \sim \mathcal{PLN}_X (M^\ast, \Sigma^\ast)$. As we did in the previous section we show that maximizing M is equivalent to minimize the function :\\
+$(M, \Sigma) \mapsto \sum_{j<k} \mathbb{E}_X [\mathrm{D_{KL}}(p_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)} \parallel p_{(M^{(ik)},\Sigma^{(ik)} \mid X)}]$.\\
+We have here a finite sum of positives variables, so in order to minimize it, we can minimize each of the terms. So the above function is minimal for $M^\ast=(M^{(i)}^\ast)_{i \in \{1...n\}}$ and $\Sigma^\ast$ defined as follow : the term $(\sigma_{ik})_{i \neq k}$ of $\Sigma^\ast$ is the term $\sigma_{12}$ of $\Sigma^{(ik)}^\ast$  and the term $\sigma_{ii}$ of $\Sigma^\ast$ is the term $\sigma_{11}$ of $\Sigma^{(ik)}^\ast$.\\
+Thus we have the existence of a maximum and its uniqueness.\\
+\\
+\textbf{Step 4 :} Conclusion.\\
+Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{M}_N, \widehat{\Sigma}_N)_{N \in \mathbb{N}}$ maximizing the composite likelihood function $(M,\Sigma) \mapsto \mathcal{CL}_{(M,\Sigma) \mid X}((Y^j)_{j \in \{1..N\}})$  converges in probability to what we hope to approximate, namely $(M^\ast, \Sigma^\ast)$, the parameters of our Poisson log-normale model.
+\end{proof}
+\subsubsection{Estimation of the maximum.}
+In order to estimate the maximum of the composite pairwise likelihood we performed an optimization algorithme with the gradients. We calculate the gradients and performed simulations to estimate the parameters.\\
+The calculation of the density function of the Poisson log-normale distribution are quiet costly to calculate. Since the optimization require calculation of the density function, we propose to initialise the optimisation algorithme with the results of the VEM for the Poisson log-normal model.
 \subsection{Assymptotic normality}
+The assymptotic normality is needed to construct tests in order to construct assymptotic tests to estimate the parameters and get assymptotic confidence intervalls.
 \subsubsection{M-estimator theory}
-\textit{chap.5 Assymptotic Statistics van der Vaart}
+
 \subsubsection{Assymptotic normality of the composite likelihood for the PLN model}
 \textit{proof}
-\subsubsection{Construction of assymptotic statistic tests (?)}
-\textit{Peut-etre trop scolaire...} \SR{}{Je suis d'accord. Il suffit de dire que la normalite asymptotique nous donne les intervalles de confiance (asymptotiques) et les tests (asymptotiques)}
+
 
 \section{Composite likelihood inference for spatial data}
 \subsection{Poisson log-normal model for spatial data}
