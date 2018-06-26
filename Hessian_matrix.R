@@ -24,7 +24,7 @@ Hessian<-function(param,Y,X,O,d,p){ #Ici on rentre les paramÃ¨tres d et p pour Ã
       for (l in 1:5){
         for (m in 1:5){
           if (l+m<7){
-            terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Rho[k,j])
+            terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],sqrt(Sigma[k]),sqrt(Sigma[j]),Rho[k,j])
           }
         }
       }
@@ -176,7 +176,7 @@ return(list(hess_mat,gradCL_calc))
    Sigma=param[(p*d+1):(p*d+p)]
    Rho=matrix(0,nrow=p,ncol=p)
    Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
-   Rho=t(Rho)
+   Rho=Rho+t(Rho)
    Xmu=O+X%*%Mu
    diag(Rho)<-Sigma
    Rho=cov2cor(Rho)
@@ -187,7 +187,7 @@ return(list(hess_mat,gradCL_calc))
        for (l in 1:5){
          for (m in 1:5){
            if (l+m<7){
-             terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Rho[k,j])
+             terms[(5*(k-1)+l),(5*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],sqrt(Sigma[k]),sqrt(Sigma[j]),Rho[k,j])
            }
          }
        }
@@ -314,7 +314,7 @@ return(list(hess_mat,gradCL_calc))
      Esp_hess<-Esp_hess+objets[[1]]
      Esp_gradCL<-Esp_gradCL+objets[[2]]%*%t(objets[[2]])
    }
-   return(list((1/n)*E,(1/n)*Esp_gradCL))
+   return(list((1/n)*Esp_hess,(1/n)*Esp_gradCL))
  }
 ##Test
 param=c(2,1.5,1,1,-0.5)

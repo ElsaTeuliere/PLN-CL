@@ -173,26 +173,25 @@ tps<-0
 grad_sortie_PLN<-c()
 grad_sortie_nloptr<-c()
 for (k in 1:nb_simu){
-  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)$Y
   b_time<-Sys.time()
   x_0=param_0(Obs_3,O,X)
-  lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1)))
-  ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1)))
-    grad_sortie_PLN<-c(grad_sortie_PLN,norme_L2(grad_CL_opt(x_0,Obs_3,O,X)))
+  lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-Inf,0.5*p*(p-1)))
+  ub = c(rep(Inf,p*d+p),rep(+Inf,0.5*p*(p-1)))
     param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
-                           lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-0.999,0.5*p*(p-1))), ub = c(rep(Inf,p*d+p),rep(0.999,0.5*p*(p-1))),
-                           opts=opts, Y=Obs_3, X=X,O=O)
-    param_estim=rbind(param_estim,param_optimaux$solution)
-    grad_sortie_nloptr<-c(grad_sortie_nloptr,norme_L2(grad_CL_opt(param_optimaux$solution,Obs_3,O,X)))
+                           lb = lb, ub = ub,
+                           opts=list("xtol_rel"=1*10^(-6),"algorithm"="NLOPT_LD_TNEWTON"),
+                           Y=Obs_3, X=X,O=O)
+    param_estim=rbind(param_estim,param_optimaux$par)
     c<-c+1
     nombre_iterations[length(nombre_iterations)+1]<-param_optimaux$iter
-    V_inf=Estimateurs_esp_corr(param_optimaux$solution,Obs_3,X,O)
+    V_inf=Estimateurs_esp_corr(param_optimaux$par,Obs_3,X,O)
     hess=symetrisation(V_inf[[1]])
     A=diag(hess)
     hess_ok=hess+t(hess)-diag(A)
     Vp_inf=ginv(hess_ok)
     Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
-    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$solution-param))/sqrt(diag(Godambe)))
+    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$par-param))/sqrt(diag(Godambe)))
     tps<-tps+(Sys.time()-b_time)
 }
 temps_moyen[[length(temps_moyen)+1]]<-tps/c
