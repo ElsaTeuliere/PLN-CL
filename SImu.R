@@ -143,13 +143,56 @@ for (j in 1:nb_simu){
 #####################################################################################################
 ##En calculant Godambe avec les bonnes observations
 ######################################################################################################
+constraint<-function(param,X,Y,O){
+  p=ncol(Y)
+  d=ncol(X)
+  Sigma=param[(p*d+1):(p*d+p)]
+  Rho=matrix(0,nrow=p,ncol=p)
+  Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
+  Rho=t(Rho)+Rho+diag(Sigma,p,p)
+  return(-min(eigen(Rho)$ values))
+}
+
+constraint_jacobian_approximation<-function(param,X,Y,O){
+  #On a pris un epsilon de 10^5 pour l'approximation
+  p=ncol(Y)
+  d=ncol(X)
+  Sigma=param[(p*d+1):(p*d+p)]
+  Rho=matrix(0,nrow=p,ncol=p)
+  Rho[lower.tri(Rho,diag=F)]<-param[(p*d+p+1):length(param)]
+  Rho=t(Rho)+Rho+diag(Sigma,p,p)
+  A=matrix(0,nrow=p,ncol=p)
+  for (i in 1:p){
+    for (j in i:p){
+      if(i==j){
+        E_ij<-matrix(0,nrow=p,ncol=p)
+        E_ij[i,j]<-1
+        A[i,j]<- 10^5*(-min(eigen(Rho+10^(-5)* E_ij)$values)+min(eigen(Rho)$values))
+      }else{
+        E_ij<-matrix(0,nrow=p,ncol=p)
+        E_ij[i,j]<-1
+        E_ij[j,i]<-1
+      A[i,j]<- 10^5*(-min(eigen(Rho+10^(-5)* E_ij)$values)+min(eigen(Rho)$values))
+      }
+    }
+  }
+  grad=c(rep(0,p*d),diag(A))
+  for(i in 1:(p-1)){
+    for (j in (i+1):p){
+      grad=c(grad,A[i,j])
+    }
+  }
+  return(grad)
+}
+
+
 
 n=100
 nb_simu=250
 p=5
 d=3
 O=matrix(1,n,p)
-X=matrix(runif(n,-1,1),n,1)
+X=matrix(runif(n,-5,5),n,1)
 if(d>1){
   for (j in 1:(d-1)){
     X<-cbind(X,runif(n,-1,1))
@@ -179,19 +222,25 @@ for (k in 1:nb_simu){
   lb = c(rep(-Inf,p*d),rep(1.0e-4,p),rep(-Inf,0.5*p*(p-1)))
   ub = c(rep(Inf,p*d+p),rep(+Inf,0.5*p*(p-1)))
     param_optimaux<-nloptr(x0=x_0, eval_f=neg_CL, eval_grad_f=neg_grad_CL,
+                           eval_g_ineq = constraint, eval_jac_g_ineq = constraint_jacobian_approximation,
                            lb = lb, ub = ub,
-                           opts=list("xtol_rel"=1*10^(-6),"algorithm"="NLOPT_LD_TNEWTON"),
+                           opts = list("algorithm" = "NLOPT_LD_MMA",
+                                       "print_level" = 2,
+                                       "xtol_rel"=1.0e-5,
+                                       "maxeval"=1000,
+                                       "check_derivatives" = FALSE,
+                                       "check_derivatives_print" = "all"),
                            Y=Obs_3, X=X,O=O)
-    param_estim=rbind(param_estim,param_optimaux$par)
+    param_estim=rbind(param_estim,param_optimaux$solution)
     c<-c+1
     nombre_iterations[length(nombre_iterations)+1]<-param_optimaux$iter
-    V_inf=Estimateurs_esp_corr(param_optimaux$par,Obs_3,X,O)
+    V_inf=Estimateurs_esp_corr(param_optimaux$solution,Obs_3,X,O)
     hess=symetrisation(V_inf[[1]])
     A=diag(hess)
     hess_ok=hess+t(hess)-diag(A)
     Vp_inf=ginv(hess_ok)
     Godambe=Vp_inf%*%V_inf[[2]]%*%Vp_inf
-    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$par-param))/sqrt(diag(Godambe)))
+    param_estim_norm<-rbind(param_estim_norm,(sqrt(n)*(param_optimaux$solution-param))/sqrt(diag(Godambe)))
     tps<-tps+(Sys.time()-b_time)
 }
 temps_moyen[[length(temps_moyen)+1]]<-tps/c

@@ -298,6 +298,19 @@ var_cov_spatial<-function(points_x,points_y,alpha,sigma){
 }
 
 
+var_cov_spatial_dist<-function(mat_dist,alpha,sigma){
+  p=length(points_x)
+  var=matrix(0,p,p)
+  for(i in 1:(p-1)){
+    for (j in (i+1):p){
+      var[i,j]<-exp(-alpha*mat_dist)
+    }
+  }
+  var<-var+t(var)
+  diag(var)<-rep(1,p)
+  return(sigma*var)
+}
+
 
 n=100
 nb_simu=250
@@ -525,11 +538,12 @@ pltt<-ggplot(data=E_prime,aes(x=value))+geom_histogram()+facet_wrap(~variable,sc
 
 ##Optimisation en utilisant d'abord nloptr qui est rapide, puis optim pour avoir une estimation de la hessienne
 
+#Dans ce cas, on n'a pas besoin de contraintes car la matrice des variances, covariances spatiales sera toutjours défénie positive
 #Simulation des paramètres
 p=5
 d=2
 n=50
-nb_simu=250
+nb_simu=100
 O=matrix(1,n,p)
 X=matrix(runif(n,-1,1),n,1)
 if(d>1){
@@ -556,10 +570,9 @@ for (j in 1:(p-1)){
 
 param_estim=c()
 param_estim_norm=c()
-diff_hessian=c()
 ##Simulation des observations
 for (k in 1:nb_simu){
-  Obs_3=Observations_simulees_bis(n,p,X,O,param)
+  Obs_3=Observations_simulees_bis(n,p,X,O,param)$Y
   x_0=param_0(Obs_3,O,X)
   x_init=c(x_0[1:(p*d)]) #PLN ne nous sort pas le modèle spatialisé. L'idée est donc d'approcher sigma et alpha. 
   #Pour sigma on fait la moyenne des variances (cf ci-dessous)
@@ -594,7 +607,7 @@ for (k in 1:nb_simu){
   upper=c(rep(Inf,p*d),10^9,10^9)
   param_optimaux_nl<-nloptr(x_init,eval_f=fonction_a_optimiser,lb=lower,ub=upper,eval_grad_f=NULL,opts = opts)
   ##Optimisation avec optim
-  param_optimaux<-optim(param_optimaux_nl,fn=fonction_a_optimiser,eval_grad_f=NULL,method = "SANN",hessian = TRUE,opts = opts)
+  param_optimaux<-optim(param_optimaux_nl$solution,fn=fonction_a_optimiser,method = "SANN",hessian = TRUE)
   param_estim=rbind(param_estim,param_optimaux$solution)
   Vp_inf=ginv(param_optimaux$hessian)
   grad=param_optimaux$gradient%*%t(param_optimaux$gradient)

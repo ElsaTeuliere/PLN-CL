@@ -37,8 +37,7 @@ CL_f<-function(param,Y,O,X){
   for(i in 1:n){
     for (j in 1:(p-1)){
       for (k in (j+1):p){
-        CL<-CL+log(dbipoilog(Y[i,j],Y[i,k],mu1=Xmu[i,j],mu2=Xmu[i,k],sig1 = Sigma[j],sig2 = Sigma[k],rho = Corr[j,k]))
-      }
+          CL<-CL+log(dbipoilog(Y[i,j],Y[i,k],mu1=Xmu[i,j],mu2=Xmu[i,k],sig1 = sqrt(Sigma[j]),sig2 = sqrt(Sigma[k]),rho = Corr[j,k]))
     }
   }
   return(CL)
@@ -133,7 +132,7 @@ grad_CL_uni<-function(Y,X,O,d,p,Xmu,Sigma,Rho){
       for (l in 1:3){
         for (m in 1:3){
           if (l+m<5){
-            terms[(3*(k-1)+l),(3*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,Xmu[k],Xmu[j],Sigma[k],Sigma[j],Corr[k,j])
+            terms[(3*(k-1)+l),(3*(j-1)+m)]<- dbipoilog(Y[k]+l-1,Y[j]+m-1,mu1=Xmu[k],mu2= Xmu[j],sig1 =  sqrt(Sigma[k]),sig2=sqrt(Sigma[j]),rho = Corr[k,j])
           }
         }
       }
@@ -232,7 +231,7 @@ Observations_simulees_bis<-function(n,p,X,O,param){
   Z=mvrnorm(n,rep(0,p),Rho)
   means_mat=expOXMu*exp(Z)
   Y = matrix(rpois(n*p,means_mat ), n, p)
-  return(Y)
+  return(list(Y=Y,Z=Z,mean=means_mat))
 }
 ######################################################################################################################################
 ##Détermination des paramètres initiaux

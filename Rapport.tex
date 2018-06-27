@@ -294,7 +294,7 @@ $\Psi_n(\theta)=\frac{1}{N}\sum_{i=1}^N \Psi_\theta(X_i) = \mathbb{P}_N \Psi_\th
 $\Psi(\theta) = \mathrm{P}\Psi_\theta$
 \end{center}
 \begin{theorem} \cite{vaart_1998} \label{ThAN}
-Let $\Theta$ be an euclidian space. For each $\theta \in \Theta$, let $\theta \mapsto \Psi_\theta (x)$ une fonction $\mathcal{C}^2$ with respect to the variable $x$. Suppose that there exists $\theta_0$, such that $\mathrm{P} \Psi_{\theta_0} =0 $ and $\mathrm{P} \parallel \Psi_{\theta_0} \parallel^2 < \infty$. Indeed, we suppose that the matrix $\mathrm{P} \dot{\Psi}_{\theta_0}$ exists and is non-singular. Assume that the second-order partial derivatives are dominated by a fixed integrable function in the variable  $\ddot{\Psi}$ for every $\theta$ in a neiborhood of $\theta_0$. Consider a consistent estimator sequence $\widehat{\theta}_N$ such that $\Psi_N(\widehat{\theta}_N)=0$, the sequence $\sqrt{n}(\widehat{\theta}_N - \theta_0)$ converges in law to $\mathcal{N}(0,(\mathrm{P} \dot{\Psi}_{\theta_0})^{-1} \mathrm{P} \Psi_{\theta_0} \mathrm{P} \Psi_{\theta_0}^T (\mathrm{P} \dot{\Psi}_{\theta_0})^{-1})$.
+Let $\Theta$ be an euclidian space. For each $\theta \in \Theta$, let $\theta \mapsto \Psi_\theta (x)$ une fonction $\mathcal{C}^2$ with respect to the variable $x$. Suppose that there exists $\theta_0$, such that $\mathrm{P} \Psi_{\theta_0} =0 $ and $\mathrm{P} \parallel \Psi_{\theta_0} \parallel^2 < \infty$. Indeed, we suppose that the matrix $\mathrm{P} \dot{\Psi}_{\theta_0}$ exists and is non-singular. Assume that the second-order partial derivatives are dominated by a fixed integrable function in the variable  $\ddot{\Psi}$ for every $\theta$ in a neiborhood of $\theta_0$. Consider a consistent estimator sequence $\widehat{\theta}_N$ such that $\Psi_N(\widehat{\theta}_N)=0$, the sequence $\sqrt{n}(\widehat{\theta}_N - \theta_0)$ converges in law to $\mathcal{N}(0,(\mathrm{P} \dot{\Psi}_{\theta_0})^{-1} \mathrm{P} \Psi_{\theta_0} \mathrm{P} \Psi_{\theta_0}^T (\mathrm{P} \dot{\Psi}_{\theta_0})^{-1}))$.
 \end{theorem}
 \subsubsection{Assymptotic normality of the composite likelihood for the PLN model}
 We want to apply theorem \ref{ThAN} to our problem of M-maximization. In this case the function $\Psi_\theta$ is given by the derivative of the composite likelihood.\\
@@ -393,8 +393,21 @@ Where $\rho^2$ is the variance of the error. We want to minimize the variance of
 Choosing $I$ under this two constraints, that is actually determining a maximum spanning tree over the following network : the vertices are the points $ \{i \in \{1...n\} \}$ and the edge between $i$ and $j$ is given by $d_{ij}$. We propose to choose the maximum spanning tree by using the Kruskal algorithm \cite{Kruskal1956}. 
 
 \section{Illustrations}
-We performed two main illustration of the theory developped in th previous sections, on one hand we performed simulation to chck our methods, on the other hand, we applied our model on spatial data of ticks-abundance in a french forest.
+We performed two main illustration of the theory developped in the previous sections, on one hand we performed simulation to check our methods, on the other hand, we applied our model on spatial data of ticks-abundance in a french forest.
+\subsection{Implementation}
+We implemented an algorithm in order to estimate the parameters of a Poisson log-normal distribution by maximizing the composite likelihood. The idea is the following.
+\begin{enumerate}
+\item We first performed a PLN model on the data, to get a first estimate of the parameters that we expect to be close to the solution. 
+\item Using the nlopt package on \texttt{R} and the \texttt{NLOPT_LD_MMA} algorithm we determined the parameters maximizing the composite pairwise likelihood. We optimized the pariwise composite likelihood under the constraint that the variance-covariance matrix defined by the parameters has to be non negative. The \texttt{R}-nlopt function to optimize under constraint need the jacobian of the constraint function. The constraint function, in our case is :
+\begin{align*}
+f : \Sigma \mapsto - \mathrm{min}\{\lambda, \lambda \in Sp(\Sigma)}
+\end{align*}
+We estimated the jacobian of this matrix rather than calculating it explicitly.
+\item Then we estimated the Godambe matrix by the empirical mean of the value of the hessian taken over the observations. This calculation allows us to normalize the estimators.
+\end{enumerate}
+
 \subsection{Simulations}
+We performed simulations in order to illustrate our results. We focus on the case of $N=100$ observations with $n=5$ variables of interest and $p=3$ covariates. The simulations were run over 250 repetitions. 
 \subsection{Exemple of utilisation on spatial data : Ticks abundance in a french forest}
 \section{Conclusion}
 \appendix
@@ -429,10 +442,10 @@ So we conclude that
 \begin{align*}
 \partial_{M^{(i)}}\mathrm{log}( h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)) &= X(Y_j -(Y_j+1)\frac{H_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j+1,Y_k)}{h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k))})
 \end{align*}
-\subsection{With respect to the matrix of variance - covariance.}
+\subsubsection{With respect to the matrix of variance - covariance.}
 The terms of the variance-covariance matrix are only present in the density function of the latent multivariate gaussian distribution. In order to calculate the derivatives we will in both cases follow the same path :
 \begin{enumerate}
-\item We calculate the derivatives of the density function of the bivariate normale distribution with respect to the parameter of interest. By derivating under the $\int$ we deduce the derivative of the Poisson-log-normale density function.
+\item We calculate the derivatives of the density function of the bivariate gaussian distribution with respect to the parameters of interest. By derivating under the $\int$ we deduce the derivative of the Poisson-log-normal density function.
 \item We integrate by part to have a nice expression of this derivative.
 \end{enumerate}
 We recall here that the density function of the Poisson log-Normal distribution with regression parameters $M$ and matrix of variance-covariance $\Sigma$, given a vector of covariables $X$ is given by :
@@ -442,51 +455,51 @@ h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)=\int_{\mathbb{R}^2} f_{e^{X^T M^{(j
 With $g_{(0,\Sigma^{(jk)})}$ the density function of the bivariate normale distribution of mean $0$ and variance-covariance $\Sigma^{(jk)}$ and $f_{\beta}$ the density function of a Poisson distribution with parameters $\beta$.
 We finally recall that : $h_{(0,\Sigma^{(jk)})}(z_1,z_2)=\frac{1}{2 \pi \sqrt{\mid \sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}\mid} \mathrm{e}^{-\frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 -2 \sigma_{jk} z_1 z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}}$.
 
-\subsubsection{wrt $\sigma_{jj}$ and $\sigma_{kk}$}
+\paragraph{wrt $\sigma_{jj}$ and $\sigma_{kk}$}
 \begin{align*}
 \partial_{\sigma_{jj}} g_{(0,\Sigma^{(jk)})} (z_1,z_2) &= \frac{1}{2} [ \frac{-\sigma_{kk}}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} +  \frac{(\sigma_{jk} z_1 - \sigma_{kk} z_2)^2}{(\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2)^2}  ]g_{(0,\Sigma_{jk})}(z_1,z_2)
 \end{align*}
 
-Since the bivariate normale distribution admit second order moments, we can apply  the thoerem of derivation under $\int$ and deduce that :
+Since the bivariate gaussian distribution admits second order moments, we can apply  the thoerem of derivation under $\int$ and deduce that :
 \begin{align*}
-\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) &=\int_{\mathbb{R}^2} f_{e^{X^T M^{(j)}+z_1}}(Y_j) h_{e^{X^T M^{(k)}+z_2}}(Y_k)\frac{1}{2} [ \frac{-\sigma_{kk}}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} +  \frac{(\sigma_{jk} z_1 - \sigma_{kk} z_2)^2}{(\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2)^2}  ] g_{(0,\Sigma^{(jk)})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
+\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) &=\int_{\mathbb{R}^2} f_{e^{X^T M^{(j)}+z_1}}(Y_j) f_{e^{X^T M^{(k)}+z_2}}(Y_k)\frac{1}{2} [ \frac{-\sigma_{kk}}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} +  \frac{(\sigma_{jk} z_1 - \sigma_{kk} z_2)^2}{(\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2)^2}  ] g_{(0,\Sigma^{(jk)})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
 \end{align*}
 
 \noindent We will now try to find a nicer expression of this derivative. One can remark that $\partial_{z_2} (-\frac{1}{2} \frac{\sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 -2 \sigma_{jk} z_1 z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}) = \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2}$.
 
 This gives the clue to integrate by part with respect to $z_2$. We then have :
 \begin{align*}
-\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) =& \int_{\mathbb{R}} [  h_{e^{X^T M^{(j)}+z_1}}(Y_j) h_{e^{X^T M^{(k)}+z_2}}(Y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} g_{(0,\Sigma_{jk})}(z_1,z_2) ]_{- \infty}^{+\infty} \mathrm{d}z_1\\
+\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) =& \int_{\mathbb{R}} [  f_{e^{X^T M^{(j)}+z_1}}(Y_j) f_{e^{X^T M^{(k)}+z_2}}(Y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} g_{(0,\Sigma_{jk})}(z_1,z_2) ]_{- \infty}^{+\infty} \mathrm{d}z_1\\
  &- \int_{\mathbb{R}^2} Y_k f_{e^{X^T M^{(j)}+z_1}}(Y_j) f_{e^{X^T M^{(k)}+z_2}}(Y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} g_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2\\
- &- \int_{\mathbb{R}^2} (Y_k+1) f_{e^{X^T  M^{(j)}+z_1}}(Y_j)  f_{e^{X^T M^{(k)}+z_2}}(Y_k+1) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2
+ &- \int_{\mathbb{R}^2} (Y_k+1) f_{e^{X^T  M^{(j)}+z_1}}(Y_j)  f_{e^{X^T M^{(k)}+z_2}}(Y_k+1) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk}-\sigma_{jk}^2} g_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2
 \end{align*}
 The derivatives of the density function of the Poisson distribution is obtained as we did in the previous section.\\
-The first rht of this equality being null, we can again integrate by part wrt $z_2$ and we get :
+The first term of this equality is null, so we can again integrate by part wrt $z_2$ and we get :
 \begin{align*}
-\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_k^2 p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)\\
-& - ((y_k+1)^2 + y_k (y_k+1) ) p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1) \\
-& + (y_k+1)(y_k+2) p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+2)
+\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) &= Y_k^2 h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)\\
+& - ((Y_k+1)^2 + Y_k (Y_k+1) ) h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k+1) \\
+& + (Y_k+1)(Y_k+2) h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k+2)
 \end{align*} 
-We are calculating this gradients in order to approximate the composite log likelihood so we are in fact interested in $\partial_{\sigma_{jj}} \mathrm{log}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$, which we now can easily calculate.
+We are calculating this gradients in order to approximate the composite log likelihood so we are in fact interested in $\partial_{\sigma_{jj}} \mathrm{log}h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)$, which we now can easily calculate.
 \begin{align*}
-\partial_{\sigma_{jj}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_k^2 - ((y_k+1)^2 + y_k (y_k+1) ) \frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1) } {p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}\\
-& + (y_k+1)(y_k+2)\frac{ p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+2)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}
+\partial_{\sigma_{jj}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) &= Y_k^2 - ((Y_k+1)^2 + Y_k (Y_k+1) ) \frac{h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k+1) } {h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)}\\
+& + (Y_k+1)(Y_k+2)\frac{ h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k+2)}{h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)}
 \end{align*}
-Symetrically we have wrt $\sigma_{kk}$ :
+Symetrically we have with respect to $\sigma_{kk}$ :
 \begin{align*}
-\partial_{\sigma_{kk}} p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) &= y_j^2 - ((y_j+1)^2 + y_j (y_j+1) ) \frac{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+1,y_k) } {p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}\\
-& + (y_j+1)(y_j+2)\frac{ p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+2,y_k)}{p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)}
+\partial_{\sigma_{kk}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) &= Y_j^2 - ((Y_j+1)^2 + Y_j (Y_j+1) ) \frac{h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j+1,Y_k) } {h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)}\\
+& + (Y_j+1)(Y_j+2)\frac{ h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j+2,Y_k)}{h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)}
 \end{align*}
 
-\subsubsection{wrt $\sigma_{jk}$ :}
+\paragraph{with respect to $\sigma_{jk}$ :}
 \begin{align*}
-\partial_{\sigma_{jk}}h_{(0,\Sigma)}(z_1,z_2) &= [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma)}(z_1,z_2)
+\partial_{\sigma_{jk}}g_{(0,\Sigma^{(jk)})}(z_1,z_2) &= [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] g_{(0,\Sigma^{(jk)})}(z_1,z_2)
 \end{align*}
 Again we can apply the theorem of derivating under the $\int$. We deduce that :
 \begin{align*}
-&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) =
-\int_{\mathbb{R}^2} p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k)\\
-&[   \frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma_{jk})}(z_j,z_k) \mathrm{d}z_j \mathrm{d}z_k
+&\partial_{\sigma_{jk}} h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) =
+\int_{\mathbb{R}^2} f_{e^{X^T M^{(j)}+z_1}}(Y_j) f_{e^{X^T M^{(k)}+z_2}}(Y_k)\\
+&[   \frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] g_{(0,\Sigma^{(jk)})}(z_1,z_2) \mathrm{d}z_1 \mathrm{d}z_2
 \end{align*}
 
 One can note that :
@@ -495,27 +508,132 @@ One can note that :
 &  \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}
 \end{align*}
 Which gives a clue that we could do again tow part integrations : one towards $z_1$ and one towards $z_2$. \\
-We will do a first integration by part with respect to $z_1$. We note that : $ \partial_{z_1} ( \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) = [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] h_{(0,\Sigma)}(z_1,z_2)$. And taking the derivative of the poisson density with respect to its parameters allows us to conclude that :
+We will do a first integration by part with respect to $z_1$. We note that : $ \partial_{z_1} ( \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} g_{(0,\Sigma^{(jk)})}(z_1,z_2) = [\frac{\sigma_{jk}}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} + \frac{-\sigma_{jk} ( \sigma_{jj} z_1^2 + \sigma_{kk} z_2^2 ) + \sigma_{jk} z_1 z_2 + \sigma_{jj} \sigma_{kk} z_1 z_2}{(\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2)^2}] g_{(0,\Sigma^{(jk)})}(z_1,z_2)$. And taking the derivative of the poisson density with respect to its parameters allows us to conclude that :
 \begin{align*}
-&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) = \int_{\mathbb{R}} [ p_{e^{X\mu_{jk}+z_1}}(y_j) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2)]_{- \infty}^{+ \infty} \mathrm{d}z_2\\
-& - \int_{\mathbb{R}^2} (y_j p_{e^{X\mu_{jk}+z_1}}(y_j)- (y_j+1) p_{e^{X\mu_{jk}+z_1}}(y_j+1)) p_{e^{X\mu_{jk}+z_2}}(y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
+&\partial_{\sigma_{jk}}h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) = \int_{\mathbb{R}} [ f_{e^{X^T M^{(j)}+z_1}}(Y_j) f_{e^{X^T M^{(k)}+z_2}}(Y_k) \frac{\sigma_{jk}z_1-\sigma_{kk}z_2}{\sigma_{jj} \sigma_{kk}- \sigma_{jk}^2} g_{(0,\Sigma^{(jk)})}(z_1,z_2)]_{- \infty}^{+ \infty} \mathrm{d}z_2\\
+& - \int_{\mathbb{R}^2} (Y_j f_{e^{X^T M^{(j)}+z_1}}(Y_j)- (Y_j+1) f_{e^{X^T M^{(j)}+z_1}}(Y_j+1)) f_{e^{X^T M^{(k)}+z_2}}(Y_k) \frac{\sigma_{jk} z_1 - \sigma_{kk} z_2}{\sigma_{jj} \sigma_{kk} - \sigma_{jk}^2} g_{(0,\Sigma^{(jk)})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
 \end{align*}
 The first right-hand term of the equality being equal to zero, we have, integrating by part again but this time wrt $z_2$, we have :
 \begin{align*}
-&\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) =\int_{\mathbb{R}^2} (y_j p_{e^{X\mu_{jk}+z_1}}(y_j)- (y_j+1) p_{e^{X\mu_{jk}+z_1}}(y_j+1))\\
-& (y_k p_{e^{X\mu_{jk}+z_2}}(y_k)-(y_k + 1) p_{e^{X\mu_{jk}+z_2}}(y_k+1))  h_{(0,\Sigma_{jk})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
+&\partial_{\sigma_{jk}}h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) =\int_{\mathbb{R}^2} (Y_j f_{e^{X^T M^{(jk)}+z_1}}(Y_j)- (Y_j+1) f_{e^{X^T M^{(j)}+z_1}}(Y_j+1))\\
+& (Y_k f_{e^{X^T M^{(k)}+z_2}}(Y_k)-(Y_k + 1) f_{e^{X^T M^{(jk)}+z_2}}(Y_k+1))  g_{(0,\Sigma^{(jk)})}(z_1,z_2) \mathrm{d}z_1  \mathrm{d}z_2
 \end{align*}
 What we can also write :
 \begin{align*}
-\partial_{\sigma_{jk}}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k) = &y_k y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)-(y_k+1)y_j p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k+1)\\
-& -(y_j+1)y_k p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)+ (y_k+1) (y_j+1)p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j+1,y_k+1))
+\partial_{\sigma_{jk}}h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k) = &Y_k Y_j h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)-(Y_k+1)Y_j h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k+1)\\
+& -(Y_j+1)Y_k h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)+ (Y_k+1) (Y_j+1)h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j+1,Y_k+1))
 \end{align*}
-Again we are interested in $\partial_{\sigma_{jk}}\mathrm{log}p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$ which we can now easily calculate by dividing the above quantity by $p_{(\mu_{jk},\Sigma_{jk} \mid X)}(y_j,y_k)$.
+Again we are interested in $\partial_{\sigma_{jk}}\mathrm{log}h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)$ which we can now easily calculate by dividing the above quantity by $h_{(M^{(jk)},\Sigma^{(jk)} \mid X)}(Y_j,Y_k)$.
 
 \subsection{Hessian}
+We have seen that we expect our estimators to be assymptotically normal with matrix of variance-covariance : 
+\begin{center}
+$(\mathbb{E}_{Y_1...Y_n} \partial^2_{(M,\Sigma)} \mathcal{CL}(M^\ast, \Sigma^\ast))^{-1} \mathbb{E}_{Y_1...Y_n} [\partial_{(M,\Sigma)} \mathcal{CL}(M^\ast, \Sigma^\ast) (\partial_{(M,\Sigma)} \mathcal{CL}(M^\ast, \Sigma^\ast))^T](\mathbb{E}_{Y_1...Y_n} \partial^2_{(M,\Sigma)} \mathcal{CL}(M^\ast, \Sigma^\ast))^{-1}$
+\end{center} 
+In practice, we want to estimate this quantity by the empirical mean over the repetitions in order to calculate confident sets. Thus we need to explicitly calculate the second derivatives .
+\begin{landscape}
+\paragraph{$\partial^2 M^{(i)}$}
+\begin{align*}
+\partial^2 _{ M^{(i)}} \mathcal{CL}_{(Y_1,...,Y_n,O)}(M,\Sigma \mid X) =& X X^T \sum_{j \neq i} \frac{1}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} [(Y_i+1)(Y_i+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j)\\& - (Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)-(Y_i+1)^2 h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)^2] 
+\end{align*}
+\paragraph{$\partial M^{(j)} \partial M^{(i)}$ ($i \neq j$)}
+\begin{align*}
+\partial^2 _{M^{(i)} M^{(j)}} \mathcal{CL}_{(Y_1,...,Y_n,O)}(M,\Sigma \mid X) =& X X^T \frac{(Y_i+1)(Y_j+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} \\
+&[h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) - h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)]
+\end{align*}
+\paragraph{$\partial^2 \sigma_{ii}$}
+\begin{align*}
+\partial^2_{ \sigma_{ii}}\mathcal{CL}_{(Y_1,...,Y_n,O)}(M,\Sigma \mid X) =  \sum_{j \neq i} & \frac{(Y_j+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} [ -(2 Y_j+1)^2 h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&+(Y_j+2) (4 Y_j^2 + 12 Y_j +7) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&- 2 (Y_j+2)(Y_j+3)(2 Y_j+3) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+3)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+& -(2 Y_j+1)^2 (Y_j+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)^2\\
+& + 2(Y_j+1)(Y_j+2)(2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)\\
+&+(Y_j+2)(Y_j+3)(Y_j+4)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+4)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&-(Y_j+2)^2(Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)^2]
+\end{align*}
+\paragraph{$\partial^2 \sigma_{ii} \sigma_{jj}$ ($i \neq j$}
+\begin{align*}
+\partial^2_{\sigma_{ii} \sigma_{jj}} \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) = & \frac{(Y_j+1)(Y_i+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} [(2Y_i+1) [ (2Y_j+1) (h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+& - h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1) )\\
+& + (Y_j+2) (h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)- h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+2) )]\\
+& + (Y_i+2) [ (2Y_j+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j)-h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) )\\
+& +(Y_j+2) ( h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j+2)-h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j) ) ] ]
+\end{align*}
+\paragraph{$\partial \sigma_{ii} M^{(i)}$}
+\begin{align*}
+\partial^2_{ \sigma_{ii} M^{(i)}} \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) =  X \sum_{j \neq i} & \frac{(Y_i+1)(Y_j+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} [(2Y_j+1) (h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&-h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)) + (Y_j+2) (h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)\\
+&-h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) ) ]
+\end{align*}
+\paragraph{$\partial \sigma_{ii} M^{(j)}$ ($i \neq j$)}
+\begin{align*}
+\partial^2 _{\sigma_{ii} M^{(j)} } \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) =& X \frac{(Y_j+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2}\\
+&[-(2Y_j+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+& + (Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) [(2Y_j+3)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)-(Y_j+3) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+3)] \\
+&+ (Y_j+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)[(Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)-(2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)]]
+\end{align*}
+\paragraph{$\partial^2\sigma_{ij}$}
+\begin{align*}
+\partial^2 _{\sigma_{ij}}  \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) =& \frac{1}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2}\\
+&[-(Y_j)^2(Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&+(Y_i+1)(Y_j+1)(2Y_iY_k+2Y_i+2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&+(Y_i)^2(Y_j+1)(Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&-(Y_j+1)(Y_j+2)(Y_i+1)(2Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&-Y_i^2(Y_j+1)^2 h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)^2 - 2 Y_iY_j(Y_i+1-Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)\\
+&+2 Y_i (Y_j+1)^2(Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)\\
+&-Y_j^2(Y_k+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&+Y_j^2(Y_i+1)(Y_i+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)-(Y_i+1)^2Y_j^2 h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)^2\\
+&+2(Y_i+1)^2Y_j(Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)\\
+&-(Y_i+1)(Y_j+1)(Y_i+2)(2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&(Y_i+1)(Y_i+2)(Y_j+1)(Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)-(Y_i+1)^2(Y_j+1)^2h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)^2
+\end{align*}
+\paragraph{$\partial^2 M^{(i)} \sigma_{ij}$}
+\begin{align*}
+\partial^2_{M^{(i)} \sigma_{ij}}  \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) =& X \frac{(Y_i+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2} [ h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j) ((Y_j+1) (Y_i+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1) - Y_j h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)\\
+&+(Y_i+2)Y_j h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j) - (Y_j+1)(Y_i+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+2,Y_j+1))\\
+& + h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)(-Y_i(Y_j+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)-Y_j (Y_i+1) h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)\\
+&+(Y_j+1)(Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1))]
+\end{align*}
+\paragraph{$\partial^2 \sigma{ij} \sigma{ii}$}
+\begin{align*}
+\partial^2_{ \sigma_{ii} \sigma_{ij}}  \mathcal{CL}_{(Y^1,...,Y^n,O)}(M,\Sigma \mid X) =&\frac{(Y_j+1)}{h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)^2}[h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j)\\
+&((Y_i+1)(2Y_j+1)(Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1)-3(Y_i+1)(Y_j+1)(Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+2)\\
+&-Y_i(2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)+Y_i(2Y_j+3)(Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)\\
+&-Y_i(Y_j+2)(Y_j+3)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+3)+(Y_i+1)(Y_j+2)(Y_j+3)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+3))\\
+&+(Y_j(Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j)+Y_i(Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1)-(Y_j+1)(Y_i+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i+1,Y_j+1))\\
+&((Y_j+2)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+2)-(2Y_j+1)h_{(M^{(ij)},\Sigma^{(ij)} \mid X)}(Y_i,Y_j+1))]
+\end{align*}
+\end{landscape}
+From all this calculations we can construct the hessian matrix. Since the 
 \subsection{Spatial gradient and hessian} \label{spatial}
-
-
+We just expose here the first steps of calculation of the gradient in case of a spatial parametrization. Calculation didn't end up. We propose to try again using the Malanobis metrix.\\
+Since calculation of the gradient of the desity function of the bivariate Poisson log-normal distribution is independent of the couple of observation choosen, we consider one couple of variables, let's say $(Y_i,Y_j)$ for example. The density of the PLN for $(Y_1,Y_2)$ is given by :
+\begin{align*}
+h_{(M^{(ij)},\sigma^2,\alpha \mid X)}(Y_i,Y_j) = \int \int _{\mathbb{R}^2} f_{(e^{X^T M^{(i)} + z_i})}(Y_i) f_{(e^{X^T M^{(j)} + z_j})}(Y_j) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j
+\end{align*}
+With $f_{(e^{X^T M^{(i)} + z_i})}(Y_i)$ the density function of a Poisson-law with parameter $e^{X^T M^{(i)} + z_i}$ taken in $Y_1$.\\
+\\
+\paragraph{Gradient with respect to $\sigma^2$}
+Derivating under $\int \int$, one have :
+\begin{align*}
+\partial_{\sigma^2} h_{(M^{(ij)},\sigma^2,\alpha \mid X)}(Y_i,Y_j) =\int \int _{\mathbb{R}^2} & f_{(e^{X^T M^{(i)} + z_i})}(Y_i) f_{(e^{X^T M^{(j)} + z_j})}(Y_j) \\
+&[-\frac{1}{\sigma^2} + \frac{1}{2} \frac{z_i^2 + z_j^2 - 2 e^{- \alpha d_{ij}} z_i z_j}{(\sigma^2)^2 (1-e^{-2 \alpha d_ij})}] \\
+& \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}} \mathrm{d}z_i \mathrm{d} z_j
+\end{align*}
+ So we have :
+ \begin{align*}
+ \partial_{\sigma^2} h_{(M^{(ij)},\sigma^2,\alpha \mid X)}(Y_i,Y_j) = -\frac{1}{\sigma^2}h_{(M^{(ij)},\sigma^2,\alpha \mid X)}(Y_i,Y_j)  \\
+  - \int \int_{\mathbb{R}^2} f_{(e^{X^T M^{(i)} + z_i})}(Y_i) f_{(e^{X^T M^{(j)} + z_j})}(Y_j) z_i \partial_{z_i} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}}  \mathrm{d}z_i \mathrm{d} z_j \\
+ - \int \int_{\mathbb{R}^2} f_{(e^{X^T M^{(i)} + z_i})}(Y_i) f_{(e^{X^T M^{(j)} + z_j})}(Y_j) z_j \partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}}  \mathrm{d}z_i \mathrm{d} z_j
+ \end{align*}
+ From here the idea is to integrate by part the two last terms. \\
+ We intergrate $\partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) \frac{1}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}$ and derive $ z_j f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j)$ with respect to $z_j$. If we note $g_{(\alpha, \sigma^2)}(z_i,z_j) =  \frac{e^{- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}})}}}{2 \pi \sigma^2 \sqrt{1-e^{-2 \alpha d_{ij}}}} $, we then get :
+ \begin{align*}
+ - \int \int_{\mathbb{R}^2} f_{(e^{\mu_i X + z_i})}(Y_i) f_{(e^{\mu_j X + z_j})}(Y_j) z_j \partial_{z_j} (- \frac{z_i^2+z_j^2-2 e^{- \alpha d_{ij}} z_i z_j}{2 \sigma^2 (1- e^{-2 \alpha d_{ij}}}) g_{(\alpha,\sigma^2)} (z_i,z_j) \mathrm{d}z_i \mathrm{d} z_j\\
+ = h_{(M^{(ij)},\sigma^2,\alpha \mid X)}
+  +  \int \int z_j(Y_j f_{(e^{\mu_j X + z_j})}(Y_j) - (Y_j+1) f_{(e^{\mu_j X + z_j})}(Y_j+1))g_{(\alpha,\sigma^2)} (z_i,z_j) \mathrm{d}z_i \mathrm{d} z_j
+ \end{align*}
+We are not able to estime this quantity and so stopped here our calculations.
 \bibliographystyle{plain}
 \bibliography{Biblio.bib}
 \end{document}
