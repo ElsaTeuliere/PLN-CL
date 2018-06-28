@@ -54,6 +54,10 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 \maketitle
 \vspace{1cm}
 \section*{Introduction}
+Let consider consider a plant-polinisator network sampling data-set. The question could typically be : what is the effect of climate change or of urbanisation on this network. The classical linear model will difficultly estimate this effect, since your species are highly dependent of each other. The response of one particular insect on climate change, will depend on the response of the species of plant he feeds on. The PLN-Model, developped by Aitchison \textit{et al.}\cite{aitchison1989multivariate} allow to take in account for this dependency. The idea is to introduce a gaussian latent variable $Z$ that will capture all the dependency in the network. Conditionally to this latent variable, the observed count variables will be independant and follow a Poisson distribution. Chiquet \textit{et al.} \cite{chiquet2017variational} proposed an estimation of the parameters of the Poisson log-normal distribution using a Variational Expectation-Minimization algorithm. However there exists no formal results on the consistency, nor on the assymptotic normality of this estimators. Since the VEM works well, we adressed the following question : is it possibl to found an estimator with theoretical guaranties ? We propose to estimate the parameters by maximizing a pairwise composite likelihood function. We show the consistency of this methode and give some tracks to proove the assymptotic normality of the estimator. From a practical point of view, we propose to use the estimation of the VEM approach to initialize the maximization of the composite likelihood function.\\ 
+\\
+The report is organised as follow : after a short presentation of the PLN model, and of the VEM method, we present, in a second part the composite likelihood and propose an estimator of the parameters of the Poisson log-normal model by maximizing it. We show this estimator to be consistent and expect it to be assymptotically normal. In a third part, we studied the case were the dependency is structured, typically by a distance between species, and derived the calculations in this case. At least we present some simulations of the estimators. To conclude we propose an adaptation of the PLN model in order to take in account spatial dependencies. 
+
 \section{Poisson log-normal model}
 The Poisson log normal model was developped by Aitchison \textit{et al.}\cite{aitchison1989multivariate}, to modell multivariate count data.  The idea is to introduce latent gaussian variables encoding the dependency between the variables. In this section we introduce this model and our notation and briefly review the existing litterature on this model.
 \subsection{Definitions and notations}
@@ -342,16 +346,16 @@ Putting it back into the expression of the derivative with respect to $\Sigma ^{
 & + \mathbb{E}_{Z^{(ij)}} [\frac{1}{2} \Sigma^{-T} Z_{ij} Z_{ij}^T \Sigma^{-T} ( \mathrm{log} (f_{e^{X^TM^{(j)}+Z_j}}(Y_j)) +  \mathrm{log}(f_{e^{X^TM^{(i)}+Z_i}} (Y_i) ) )]
 \end{align*}
 The derivative exists and admits also a first order moment with respect to the observations. This allow us to show that the first item is verified. 
-\section{Composite likelihood inference for spatial data}
+\section{Composite likelihood inference for datawith a structured dependence}
 The typical case of spatial data is that you consider counts on different parcels, and you want to take in account the spatial structure (\textit{ie} near parcels should be highly correlated, whereas distant one should be close to be independant)  in the analysis of the response variable. The Poisson log-normal, ensure to perform a linear model while capturing the dependency between the count variables. We propose here to exploit this feature in order to perform linear models on count data with a spatial structure. 
-\subsection{Poisson log-normal model for spatial data}
-\subsubsection{One specie, spatial dependency}
-In the previous section we suppose, more or less implicitely, that the variables of interest are the the counts (for examples of individuals of different species) and that we have repetitions, eather in time or in space. In the case of the spatial model, we consider the count of only one specie on different parcels. The variables of interest will then be the number of individuals on each parcel. The repetition will then be, for exemple, different series in time.\\
+\subsection{Poisson log-normal model in case of a structured variance convariance matrix}
+Suppose that you have information of the dependency structure between the observed variables.This can typically be the case when studying genetic variants in a population. Phylogenetic \cite{pavoine2008testing} or genetic distance \cite{NEI2001828} can be calculated between individuals. In this case, and inspired by what is done in spatial model, we can assume that the dependance matrix is structured. We study here one exemple of this structure.
 \subsubsection{spatial parametrisation of the PLN}
 We introduce the following notations : 
 \begin{itemize}
-\item $n \in \mathbb{N}$ is the number of parcels. $Y_1...Y_n$ are the counts of the number of individuals on each parcel.
-\item In order to capture the spatial dependency in the variance-covariance matrix, we suppose that it is of the form 
+\item $n \in \mathbb{N}$ is the number of individuum observed. $Y_1...Y_n$ are the counts of the number of individuals.
+\item $N \in \mathbb{N}$ represents the number of independant repetitions. For example the number of sampling. As previously, $X \in \mathcal{M}_{N \times d}(\mathbb{R})$ is the number of covariates.
+\item We suppose the matrix of variance covariance to be structured in the form 
 \begin{align*}
 \Sigma = \sigma^2 \begin{pmatrix}
 1 &  e^{-\alpha d_{1,2}} &  e^{-\alpha d_{1,2}} & \ldots &  e^{- \alpha d_{1,n}}  \\
@@ -361,10 +365,10 @@ We introduce the following notations :
  e^{-\alpha d_{1,n}} &  e^{-\alpha d_{2,n}} & \ldots & \ldots & 1 
 \end{pmatrix}
 \end{align*} 
-with $d_{ij}$ the distance between the parcels $i$ and $j$, $\alpha$ the so called spatial range, and $\sigma^2$ the variance.
+with $d_{ij}$ the, for example; phylogenetic distance between the species $i$ and $j$, $\alpha$ the range, and $\sigma^2$ the variance.
 \end{itemize}
  
- In case of a "spatial" PLN, the number of parameters is reduce, since we only need to estimate $\sigma^2$ and $\alpha$ to capture the whole dependency structure. In a sense, there are more constrain in the matrix of variance and covariance, we need to adapt the calculation we previously did to this special case. 
+ In case of a "structured" PLN, the number of parameters is reduce, since we only need to estimate $\sigma^2$ and $\alpha$ to capture the whole dependency structure. In a sense, there is more constraint in the matrix of variance and covariance. In this sens, we need to adapt the calculation we previously did to this special case. 
 \subsection{Estimation of the parameters for the model spatial}
 As we explained for the general PLN-model, we first tried to calculate the gradient of the composite likelihood, in order to optimize the composite likelihood, using an optimization algorithme based on true caclulations of the gradient. Since we failed to get an explicit expression of the gradient under this constrain, we propose to maximize the likelihood with algorithms that do not need exact expressions of the gradient. At least, since this optimisation methods are very costly, we propose restrain the number of pairs taken in account in the composite likelihood.
 \subsubsection{Explicit calculation of the gradient}
@@ -392,24 +396,34 @@ Where $\rho^2$ is the variance of the error. We want to minimize the variance of
 \\
 Choosing $I$ under this two constraints, that is actually determining a maximum spanning tree over the following network : the vertices are the points $ \{i \in \{1...n\} \}$ and the edge between $i$ and $j$ is given by $d_{ij}$. We propose to choose the maximum spanning tree by using the Kruskal algorithm \cite{Kruskal1956}. 
 
-\section{Illustrations}
+\section{Simulations}
 We performed two main illustration of the theory developped in the previous sections, on one hand we performed simulation to check our methods, on the other hand, we applied our model on spatial data of ticks-abundance in a french forest.
 \subsection{Implementation}
 We implemented an algorithm in order to estimate the parameters of a Poisson log-normal distribution by maximizing the composite likelihood. The idea is the following.
 \begin{enumerate}
 \item We first performed a PLN model on the data, to get a first estimate of the parameters that we expect to be close to the solution. 
-\item Using the nlopt package on \texttt{R} and the \texttt{NLOPT_LD_MMA} algorithm we determined the parameters maximizing the composite pairwise likelihood. We optimized the pariwise composite likelihood under the constraint that the variance-covariance matrix defined by the parameters has to be non negative. The \texttt{R}-nlopt function to optimize under constraint need the jacobian of the constraint function. The constraint function, in our case is :
+\item Using the nloptr package on \texttt{R} and the \texttt{NLOPT GN DIRECT L} algorithm we determined the parameters maximizing the composite pairwise likelihood. We optimized the pariwise composite likelihood under the constraint that the variance-covariance matrix defined by the parameters has to be non negative. The \texttt{R}-nlopt function to optimize under constraint need the jacobian of the constraint function. The constraint function, in our case is :
 \begin{align*}
-f : \Sigma \mapsto - \mathrm{min}\{\lambda, \lambda \in Sp(\Sigma)}
+f : \Sigma \mapsto - \mathrm{min}\{\lambda, \lambda \in Sp(\Sigma)\}
 \end{align*}
-We estimated the jacobian of this matrix rather than calculating it explicitly.
+We use an algorithme that doesn't need the explicit expression of the gradient, since we were not able, to calculate the gradient of the constraint.
 \item Then we estimated the Godambe matrix by the empirical mean of the value of the hessian taken over the observations. This calculation allows us to normalize the estimators.
 \end{enumerate}
 
 \subsection{Simulations}
 We performed simulations in order to illustrate our results. We focus on the case of $N=100$ observations with $n=5$ variables of interest and $p=3$ covariates. The simulations were run over 250 repetitions. 
-\subsection{Exemple of utilisation on spatial data : Ticks abundance in a french forest}
+
+
 \section{Conclusion}
+The Poisson log-normal is a model for count data that allow to perform a linear model, \textit{ie} to estime regression parameters taking in account the dependency structure in the data. We here show that estimating the parameters in maximizing the pairwise composite likelihood provide a consistent estimator as well of the regression parameters, as from from the dependency structure (\textit{ie} from the variance and covariance). Furthermore we expect this estimator to be assymptotically normal, which allows to construct confident sets and so to give interpretable results. At least we looked at the case of a structured dependency matrix. We first expected that the numerical results were easier to interpret, but calculations has to be developped, we failed to get an interpretable expression. At least we performed some simulations of our data. The results are in adequation with what we expected and so support to go further in this sense.\\
+\\
+At the beginning of the project, the idea was to use the PLN-model to estimate the regression parameters in case of spatially structured data. We first thought that it is as easy as what we developped in section 3, but this case doesn't allow to take in account for the covariates. We just give here an insigth and first reflexions on how this model could be adapted to spatial data. \\
+Let's recall the general model for estimation of regression parameters. In the more general case we can expect that there are two types of dependency in the data : the dependency between the observed variables, the one we consider in our model, namely $\Sigma$ on the figure \label{?} and the dependency between the observations, namely $\Gamma$ on the figure. So there is a variance in the observed variable $V(Y) = \Sigma \otimes \Gamma$. In this report, we assumed repetitions to be independant and identically distributed. In this manner, the $\Gamma$ matrix is the identity and thus, we only estimate for the $\Gamma$ matrix. In case of spatial data, we have to adapt the PLN-model because we are interested in the case of estimation of the regression parameters with a (spatial)-dependence structure between the repetitions.
+\begin{figure}
+
+\end{figure}
+\nearrow
+\newpage  
 \appendix
 \section{Appendix}
 \subsection{Gradients} \label{grad}
