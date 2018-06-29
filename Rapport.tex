@@ -54,8 +54,12 @@ Composite likelihood inference of the parameters of a Poisson log-normale distri
 \maketitle
 \vspace{1cm}
 \section*{Introduction}
-In ecology, studying a community of species often implies analysing correlated count data. Famous exemples are plant-polinisator or host-pathogens networks. Ecologist often try to explain the effect of different covariates, for exemple climate in the case of plant-polinisators, or stress level for host-pathogens, on the interactions or simply abundance. The classical linear model will difficultly estimate this effect, since your species are highly dependent on each other. The response of one particular insect on climate change, will depend on the response of the species of plant he feeds on. The PLN-Model, developped by Aitchison \textit{et al.}\cite{aitchison1989multivariate} allow to take in account for this dependency. The idea is to introduce a gaussian latent variable $Z$ that will capture all the dependency in the network. Conditionally to this latent variable, the observed count variables will be independant and follow a Poisson distribution. Chiquet \textit{et al.} \cite{chiquet2017variational} proposed an estimation of the parameters of the Poisson log-normal distribution using a Variational Expectation-Minimization algorithm. However there exists no formal results on the consistency, nor on the assymptotic normality of this estimators. Since the VEM works well, we adressed the following question : is it possibl to found an estimator with theoretical guaranties ? We propose to estimate the parameters by maximizing a pairwise composite likelihood function. We show the consistency of this methode and give some tracks to proove the assymptotic normality of the estimator. From a practical point of view, we propose to use the estimation of the VEM approach to initialize the maximization of the composite likelihood function.\\ 
-\\
+\indent In ecology, studying a community of species often implies analysing correlated count data. Famous exemples are plant-polinisator or host-pathogens networks. Ecologist often try to explain the effect of different covariates, for exemple climate in the case of plant-polinisators, or stress level for host-pathogens, on the interactions or simply abundance. The classical linear model will difficultly estimate this effect, since the counsidered species are highly dependent on each other. The response of one particular insect on climate change, will depend on the response of the species of plant he feeds on.\\
+
+The Poisson lognormal Model (PLN-Model), developped by Aitchison \textit{et al.}\cite{aitchison1989multivariate} allows to take in account this dependency. The idea is to introduce a gaussian latent variable $Z$ that will capture all the dependency in the network. Conditionally to this latent variable, the observed count variables will be independant and follow a Poisson distribution. Chiquet \textit{et al.} \cite{chiquet2017variational} proposed an estimation of the parameters of the Poisson log-normal distribution using a Variational Expectation-Minimization algorithm. However there exists no formal results on the consistency, nor on the assymptotic normality of this estimators. We were interested in constructing an consistent and assymptotically normal estimator of the parameters.\\
+
+ We propose to estimate the parameters by maximizing a pairwise composite likelihood function. We show the consistency of this methode and give some tracks to proove the assymptotic normality of the estimator. From a practical point of view, we propose to use the estimation of the VEM approach to initialize the maximization of the composite likelihood function.\\ 
+
 The report is organised as follow : after a short presentation of the PLN model, and of the VEM method, we present, in a second part the composite likelihood and propose an estimator of the parameters of the Poisson log-normal model by maximizing it. We show this estimator to be consistent and expect it to be assymptotically normal. In a third part, we studied the case were the dependency is structured, typically by a distance between species, and derived the calculations in this case. At least we present some simulations of the estimators. To conclude we propose an adaptation of the PLN model in order to take in account spatial dependencies. 
 
 \section{Poisson log-normal model}
@@ -137,7 +141,7 @@ Let $\{\mathcal{A}_1,..., \mathcal{A}_k\}$ be a set of marginal or conditional e
 \end{align*}
 Where $w_i$ are non negative weights to be choosen.
 \end{definition}
-The idea behind composite marginal likelihood \cite{varin2008} is to compose low dimensional marginal densities in order to symplify the calculations, but also to capture the dependence between the parameters. \\
+The idea behind composite marginal likelihood \cite{varin2008composite} is to compose low dimensional marginal densities in order to symplify the calculations, but also to capture the dependence between the parameters. \\
 If there is no dependance structure, it is sufficient to take the product of the one-dimensional densities. Otherwise, the two-dimensionnal marginal densities are needed at least, to capture the  dependence between the parameters.\\
 \\
 No theoretical results exist about the loss of efficiency \cite{lele2006sampling}. The idea is to show that maximizing the composite likelihood is a consitent assymptotic estimator of the parameters.
@@ -240,13 +244,13 @@ Using the large number low, we do have that $\frac{1}{N} \sum_{i=1}^{N} \mathrm{
 Using the formula of this moment we recall in the presentation of the model, we find that $\sigma_{ii} = \sigma'_{ii}$, $\sigma_{ik}=\sigma'_{ik}$ and $X (M^i-M'^i)=0$. The last condition has to be true for any vector of covariable $X$. We deduce from this that,  we expect $\mathcal{X}^\perp = \{0\}$ for the model to be identifable, \textit{ie.} that $\mathrm{rg}(\mathcal{X})=d$.\\
 \\
 \textbf{Step 3 :} Existence of a unique maximum for the function $\mathrm{M}$.\\
-What we consider is nothing else than the log-likelihood of two variables with a Poisson-log-normale distribution. We just shew that the model is identifiable. So there exist one and only one set of parameters $(M^{(ik)}^\ast, \Sigma^{(ik)}^\ast)$ such that $(Y_j,Y_k) \sim \mathcal{PLN}_X(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast)$. We first can show that maximizing the log-likelihood is equivalent to minimize the Kullback divergence. We recall that the Kullback divergence for two distributions of density functions $p_\theta$ and $p_{\theta^\ast}$ is given by $\mathrm{D_{KL}}(p_{\theta^\ast} \parallel p_{\theta})= \int p_{\theta^\ast}(x) \mathrm{log}(\frac{p_{\theta^\ast}(x)}{p_{\theta}(x)}) \mathrm{d}x$. Since we have :
+What we consider is nothing else than the log-likelihood of two variables with a Poisson-log-normale distribution. We just shew that the model is identifiable. So there exist one and only one set of parameters $(M^{(ik)\ast}, \Sigma^{(ik)\ast})$ such that $(Y_j,Y_k) \sim \mathcal{PLN}_X(M^{(ik)\ast},\Sigma^{(ik)\ast})$. We first can show that maximizing the log-likelihood is equivalent to minimize the Kullback divergence. We recall that the Kullback divergence for two distributions of density functions $p_\theta$ and $p_{\theta^\ast}$ is given by $\mathrm{D_{KL}}(p_{\theta^\ast} \parallel p_{\theta})= \int p_{\theta^\ast}(x) \mathrm{log}(\frac{p_{\theta^\ast}(x)}{p_{\theta}(x)}) \mathrm{d}x$. Since we have :
 \begin{align*}
-\mathbb{E}_X[\mathbb{E}_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}&[\mathrm{log}(h_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}(Y_i,Y_k)) - \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_j,Y_k))]] \\
+\mathbb{E}_X[\mathbb{E}_{(M^{(ik)\ast},\Sigma^{(ik)\ast} \mid X)}&[\mathrm{log}(h_{(M^{(ik)\ast},\Sigma^{(ik)\ast} \mid X)}(Y_i,Y_k)) - \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_j,Y_k))]] \\
 & = \mathbb{E}_X[\mathrm{D_{KL}}(h_{(\mu_{jk}^\ast,\Sigma_{jk}^\ast \mid X)}\parallel h_{(\mu^{(ik)},\Sigma^{(ik)} \mid X)})]\\
-& = \mathbb{E}_X[\mathbb{E}_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}[\mathrm{log}(h_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)}(Y_i,Y_k))]] - \mathrm{M}(M^{(ik)},\Sigma^{(ik)})
+& = \mathbb{E}_X[\mathbb{E}_{(M^{(ik)\ast}\,\Sigma^{(ik)\ast} \mid X)}[\mathrm{log}(h_{(M^{(ik)\ast},\Sigma^{(ik)\ast} \mid X)}(Y_i,Y_k))]] - \mathrm{M}(M^{(ik)},\Sigma^{(ik)})
 \end{align*}
- Since the Kullback-divergence is always positive, we see that maximizing the log-likelihood is equivalent to minimize the Kullback-divergence. The Kullback-divergence is only zero if the two distributions are the same. So we see that the M function is maximum for $(M^{(ik)},\Sigma^{(ik)})=(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast)$. So we can conclude that the function M only has one maximum, and this maximum is obtained for the parameters we are interested in.\\
+ Since the Kullback-divergence is always positive, we see that maximizing the log-likelihood is equivalent to minimize the Kullback-divergence. The Kullback-divergence is only zero if the two distributions are the same. So we see that the M function is maximum for $(M^{(ik)},\Sigma^{(ik)})=(M^{(ik)\ast},\Sigma^{(ik)\ast})$. So we can conclude that the function M only has one maximum, and this maximum is obtained for the parameters we are interested in.\\
 \\
 \textbf{Step 4 :} Conclusion.\\
 To summurize we have :
@@ -255,9 +259,9 @@ To summurize we have :
 \begin{center}
  $\underset{(M^{(ik)},\Sigma^{(ik)})}{\mathrm{sup}} \mid \frac{1}{N} \sum_{j=1}^{N} \mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y^j_i,Y^j_k)) - \mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]] \mid \overset{\mathbb{P}}{\longrightarrow} 0 $ 
  \end{center}
-\item The function $(M^{(ik)},\Sigma^{(ik)})\mapsto \mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]] $ only has one maximum for $(M^{ik},\Sigma^{(ik)})=(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast)$, the parameters of the Poisson-log-Normale distribution of the variables $(Y_i,Y_k)$.
+\item The function $(M^{(ik)},\Sigma^{(ik)})\mapsto \mathbb{E}_X[\mathbb{E}_{Y_i Y_k \mid X}[\mathrm{log}(h_{(M^{(ik)},\Sigma^{(ik)} \mid X)}(Y_i,Y_k))]] $ only has one maximum for $(M^{ik},\Sigma^{(ik)})=(M^{(ik)\ast},\Sigma^{(ik)\ast})$, the parameters of the Poisson-log-Normale distribution of the variables $(Y_i,Y_k)$.
 \end{enumerate}
-Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{M}^{(ik)}_N, \widehat{\Sigma}^{ik}_N)_{N \in \mathbb{N}}$ converges in probability to what we hope to approximate, namely $(M^{(ik)}^\ast, \Sigma^{(ik)}^\ast$).
+Applying theorem \ref{ThMest}, we conclude that the sequence of estimators $(\widehat{M}^{(ik)}_N, \widehat{\Sigma}^{ik}_N)_{N \in \mathbb{N}}$ converges in probability to what we hope to approximate, namely $(M^{(ik)\ast}, \Sigma^{(ik)\ast}$).
 \end{proof}
 
 \paragraph{In dimension $n$}
@@ -278,8 +282,8 @@ The family of model we consider here is $\mathcal{P}=\{ (\mathcal{PLN}_X(\mu,\Si
 \\
 \textbf{Step 3 :} Existence and uniqueness of the maximum for the function M.\\
 Again here we have by the identifiability of the model, under the assumption that the data follow a Poisson log-normale distribution, that there exist one and only one set of parameters $(M^\ast, \Sigma^\ast)$ such as given a vector of covariables $X$, $(Y^j) \sim \mathcal{PLN}_X (M^\ast, \Sigma^\ast)$. As we did in the previous section we show that maximizing M is equivalent to minimize the function :\\
-$(M, \Sigma) \mapsto \sum_{j<k} \mathbb{E}_X [\mathrm{D_{KL}}(p_{(M^{(ik)}^\ast,\Sigma^{(ik)}^\ast \mid X)} \parallel p_{(M^{(ik)},\Sigma^{(ik)} \mid X)}]$.\\
-We have here a finite sum of positives variables, so in order to minimize it, we can minimize each of the terms. So the above function is minimal for $M^\ast=(M^{(i)}^\ast)_{i \in \{1...n\}}$ and $\Sigma^\ast$ defined as follow : the term $(\sigma_{ik})_{i \neq k}$ of $\Sigma^\ast$ is the term $\sigma_{12}$ of $\Sigma^{(ik)}^\ast$  and the term $\sigma_{ii}$ of $\Sigma^\ast$ is the term $\sigma_{11}$ of $\Sigma^{(ik)}^\ast$.\\
+$(M, \Sigma) \mapsto \sum_{j<k} \mathbb{E}_X [\mathrm{D_{KL}}(p_{(M^{(ik)\ast},\Sigma^{(ik)\ast} \mid X)} \parallel p_{(M^{(ik)},\Sigma^{(ik)} \mid X)}]$.\\
+We have here a finite sum of positives variables, so in order to minimize it, we can minimize each of the terms. So the above function is minimal for $M^\ast=(M^{(i)\ast})_{i \in \{1...n\}}$ and $\Sigma^\ast$ defined as follow : the term $(\sigma_{ik})_{i \neq k}$ of $\Sigma^\ast$ is the term $\sigma_{12}$ of $\Sigma^{(ik)\ast}$  and the term $\sigma_{ii}$ of $\Sigma^\ast$ is the term $\sigma_{11}$ of $\Sigma^{(ik)\ast}$.\\
 Thus we have the existence of a maximum and its uniqueness.\\
 \\
 \textbf{Step 4 :} Conclusion.\\
@@ -336,13 +340,13 @@ $\mathrm{log} (g_{(0,\Sigma^{(ij)})} (Z_{(ij)})) = -\mathrm{log} (2 \pi \sqrt{\m
 \end{center} 
 Thanks to the formula given in \cite{petersen2008matrix}, we deduce that :
 \begin{align*}
-\partial_{\Sigma^{(ij)} } \mathrm{log} (\sqrt{\mathrm{det} \Sigma^{(ij)}}) = - (\Sigma^{(ij)}^{-1})^T\\
-\partial_{\Sigma^{(ij)} } (- \frac{1}{2} Z_{ij}^T \Sigma^{-1} Z_{ij} ) = \frac{1}{2} \Sigma^{-T} Z_{ij} Z_{ij}^T \Sigma^{-T}
+\partial_{\Sigma^{(ij)} } \mathrm{log} (\sqrt{\mathrm{det} \Sigma^{(ij)}}) = - ((\Sigma^{(ij)})^{-1})\\
+\partial_{\Sigma^{(ij)} } (- \frac{1}{2} Z_{ij}^T \Sigma^{-1} Z_{ij} ) = \frac{1}{2} \Sigma^{-1} Z_{ij} Z_{ij}^T \Sigma^{-1}
 \end{align*}
 Putting it back into the expression of the derivative with respect to $\Sigma ^{(ij)}$, one have :
 \begin{align*}
-\partial_{\Sigma^{(ij)}} \mathrm{log}(h_{(M^{(ij)},\Sigma^{(ij)}} (Y_i,Y_j)) = & \mathbb{E}_{Z^{(ij)}} [ - (\Sigma^{(ij)}^{-1})^T ( \mathrm{log} (f_{e^{X^TM^{(j)}+Z_j}}(Y_j)) +  \mathrm{log}(f_{e^{X^TM^{(i)}+Z_i}} (Y_i) ) ) ] \\
-& + \mathbb{E}_{Z^{(ij)}} [\frac{1}{2} \Sigma^{-T} Z_{ij} Z_{ij}^T \Sigma^{-T} ( \mathrm{log} (f_{e^{X^TM^{(j)}+Z_j}}(Y_j)) +  \mathrm{log}(f_{e^{X^TM^{(i)}+Z_i}} (Y_i) ) )]
+\partial_{\Sigma^{(ij)}} \mathrm{log}(h_{(M^{(ij)},\Sigma^{(ij)}} (Y_i,Y_j)) = & \mathbb{E}_{Z^{(ij)}} [ - (\Sigma^{(ij)})^{-1} ( \mathrm{log} (f_{e^{X^TM^{(j)}+Z_j}}(Y_j)) +  \mathrm{log}(f_{e^{X^TM^{(i)}+Z_i}} (Y_i) ) ) ] \\
+& + \mathbb{E}_{Z^{(ij)}} [\frac{1}{2} \Sigma^{-1} Z_{ij} Z_{ij}^T \Sigma^{-1} ( \mathrm{log} (f_{e^{X^TM^{(j)}+Z_j}}(Y_j)) +  \mathrm{log}(f_{e^{X^TM^{(i)}+Z_i}} (Y_i) ) )]
 \end{align*}
 The derivative exists and admits also a first order moment with respect to the observations. This allow us to show that the first item is verified. 
 \section{Composite likelihood inference for datawith a structured dependence}
@@ -385,7 +389,7 @@ We derive the second constraint from the linear regression of the covariances an
 Note $\widehat{\sigma_{ij}}$ an estimator of the parameter of covariance $\sigma_{ij}$.
 One have, by a linear model :
 \begin{align*}
-\mathrm{log}(\overhat{\sigma_{ij}}) = \mathrm{log} ( \sigma^2) - \alpha d_{ij} + E_{ij}
+\mathrm{log}(\widehat{\sigma_{ij}}) = \mathrm{log} ( \sigma^2) - \alpha d_{ij} + E_{ij}
 \end{align*}
 With $E_{ij}$ a noise due to estimation. We estime this noise to be  independant and identically distributed  for all the considered couples. By a classical results for the linear regression model \cite{daudin1999statistique}, one have :
 \begin{center}
@@ -405,14 +409,18 @@ We implemented an algorithm in order to estimate the parameters of a Poisson log
 \begin{align*}
 f : \Sigma \mapsto - \mathrm{min}\{\lambda, \lambda \in Sp(\Sigma)\}
 \end{align*}
-We use an algorithme that doesn't need the explicit expression of the gradient, since we were not able, to calculate the gradient of the constraint.
+We use an algorithme that doesn't need the explicit expression of the gradient, since we were not able, to calculate the gradient of the constraint. We set the default parameters of the \texttt{nlopt} function.
 \item Then we estimated the Godambe matrix by the empirical mean of the value of the hessian taken over the observations. This calculation allows us to normalize the estimators.
 \end{enumerate}
 
 \subsection{Simulations}
 We performed simulations in order to illustrate our results. We focus on the case of $N=100$ observations with $n=5$ variables of interest and $p=3$ covariates. The simulations were run over 250 repetitions. 
+\begin{figure}[!h] \label{plot}
+\includegraphics[scale=0.7]{graph53_st_DIRETC_L.png}
+\caption{Normalized results of the estimations of the parameters of a Poisson log normal model over 250 runs. The graphs \texttt{V1} to \texttt{V15} represent the regression parameters sorted as follow : at first the three regression parameters for the first observed variable, than for the second up to the fifth. The graphs \texttt{V16} to \texttt{V20} represent the normalized estimation from the variance for each variable of interest. At least, \texttt{V21} to \texttt{V30} represent the covariance sorted as follow : $\sigma_{12}$, $\sigma_{13}$...$\sigma_{15}$, $\sigma_{21}$...$\sigma_{45}$.}
+\end{figure}
 
-
+We see on figure \ref{plot} that the results are not perfect. Some estimators seem to be biased, for other there are outliers very far from the quantity we want to estimate. Our interpretation of this results is that, since we use an algorithm that do not need an explicit expression of the gradient, it sometimes fail to approach the global maximum of the composite pairwise likelihood.
 \section{Conclusion}
 The Poisson log-normal is a model for count data that allow to perform a linear model, \textit{ie} to estime regression parameters taking in account the dependency structure in the data. We here show that estimating the parameters in maximizing the pairwise composite likelihood provide a consistent estimator as well of the regression parameters, as of the dependency structure (\textit{ie} from the variance and covariance). Furthermore we expect this estimator to be assymptotically normal, which allows to construct confident sets and so to give interpretable results. At least we looked at the case of a structured dependency matrix. We first expected that the numerical results were easier to interpret, but calculations has to be developped, we failed to get an interpretable expression. At least we performed some simulations of our data. The results are in adequation with what we expected and so support to go further in this sense.\\
 \\
@@ -427,7 +435,9 @@ We give here a first description of the model in case of spatial dependency. If 
 \begin{align*}
 Y^j\mid Z^j \sim \mathcal{P}(e^{O+\beta^T X + Z_j})
 \end{align*}
-We think that also in this case, the estimator constructed by maximizing the likelihood over the pairs is a consistent and assymptotically normal estimator of $\beta$ and $\Gamma$. We propose to investigate also the sparse composite likelihood decribed in \ref{sparse}. 
+We think that also in this case, the estimator constructed by maximizing the pairwise composite likelihood over the pairs is a consistent and assymptotically normal estimator of $\beta$ and $\Gamma$. We propose to investigate also the sparse composite likelihood decribed in \ref{sparse}.\\
+\\
+At least it is tempting to try to develop a method taking in account both dependency structure. Let note $\mathcal{CL}_o{(M,\Sigma)}=\sum_{j=1}^N \sum_{1 \leq i<k \leq n} \mathrm{log}(Y^j_i, Y^j_k)$ the composite likelihood over the pairs of variables of interest and $\mathcal{CL}_s(M^T,\Gamma) = \sum_{i=1}^n \sum_{1 \leq j<l \leq N} \mathrm{log}(Y^j_i, Y^l_i)$ the composite likelihood over the pairs of observations. We propose that by maximizing the sum of this both likelihoods, \textit{ie} $\mathcal{CL}_o (M, \Sigma) + \mathcal{CL}_s (M^T, \Gamma)$, we construct an consistent and assymptotically normal estimator of the parameters, taking in account for all the dependency structure in a dataset.
 \newpage  
 \appendix
 \section{Appendix}
