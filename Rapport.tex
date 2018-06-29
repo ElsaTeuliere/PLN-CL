@@ -114,10 +114,9 @@ From the calculation of the moments, we see that for $Y^j_i$ following a Poisson
 $\mathbb{E}(Y^j_i) < \mathbb{V}(Y^j_i)$.   
 \end{center}
 The Poisson log-normal distribution is overdispersed, giving a clue that it can be applyed to a large range of multivariate count data, specially in ecology.
-Indeed $\mathrm{Cov}(Y^j_i,Y^j_k)$ and $\sigma_{ik}$ have the same sign.
-\subsection{Variational estimation of the parameters}
-\textit{\`a travailler PLN/PCA}
-\SR{}{Pour ce passage, il faut faire court en rappelant le principe de VEM et en disant qu'on sait le faire pour PLN.}
+Indeed $\mathrm{Cov}(Y^j_i,Y^j_k)$ and $\sigma_{ik}$ have the same sign.\\
+\\
+The Poisson log-normal seems to be an appropriate model to study count data with a dependency structure. Furthermore this model as been already studied and in particualar the Variational Estimation Minimization has been applied to it. Although there exist no assymptotic guaranties on this estimation, our idea is to use this efficient estimation to initialize for the search for other estimators that can be computationally very costly.
 \section{Composite likelihood estimation}
 \subsection{Definition and notation}
 \subsubsection{Presentation of the composite likelihood}
@@ -350,7 +349,7 @@ The derivative exists and admits also a first order moment with respect to the o
 The typical case of spatial data is that you consider counts on different parcels, and you want to take in account the spatial structure (\textit{ie} near parcels should be highly correlated, whereas distant one should be close to be independant)  in the analysis of the response variable. The Poisson log-normal, ensure to perform a linear model while capturing the dependency between the count variables. We propose here to exploit this feature in order to perform linear models on count data with a spatial structure. 
 \subsection{Poisson log-normal model in case of a structured variance convariance matrix}
 Suppose that you have information of the dependency structure between the observed variables.This can typically be the case when studying genetic variants in a population. Phylogenetic \cite{pavoine2008testing} or genetic distance \cite{NEI2001828} can be calculated between individuals. In this case, and inspired by what is done in spatial model, we can assume that the dependance matrix is structured. We study here one exemple of this structure.
-\subsubsection{spatial parametrisation of the PLN}
+\subsubsection{Parametrisation of the PLN distribution in case of a structured dependence}
 We introduce the following notations : 
 \begin{itemize}
 \item $n \in \mathbb{N}$ is the number of individuum observed. $Y_1...Y_n$ are the counts of the number of individuals.
@@ -375,7 +374,7 @@ As we explained for the general PLN-model, we first tried to calculate the gradi
 In \ref{spatial} we get explicit formula of what we obtained when calculating the derivatives with respect to $\alpha$ and $\sigma^2$ of one term of the composite likelihood in this case, namely $\mathrm{log}(h_{(M^{(ij)},\alpha, \sigma^2)}$. We failed to explicitly calculate this term. In turns, we could propose to estimate this quantity using for example numerical approximations such as Monte-Carlo Markov Chain.\\
 \\
 An other approach we tried, is to use optimisation algorithms that do not need an explicit expression of the gradient. Different algorithms are implemented in the software \texttt{R} and some of them (we used \texttt{optim}) give an prroximation of the hessian matrix at the optimum. This enabled us to use the assymptotic normality to construct confidence sets.
-\subsubsection{Computational optimisation by using a sparse composite likelihood}
+\subsubsection{Computational optimisation by using a sparse composite likelihood} \label{sparse}
 Spatial datasets often contain a large number $n$  of parcels, so a large number of variable of interest. The pairwise composite likelihood evaluation requires to the evaluation of $n^2$ Poisson log-normal density function. The evaluation of this function is computationally quite costly, since it implies to estimate an integral over $\mathbb{R}^2$. We propose an approach in order to limit the number of pairs taken in account in the composite likelihood. \\
 \\
 Let consider $I$ a subset of $\{(i,j) \in \{1...n\}^2\}$. We define $\mathcal{CL}^I = \sum_{(i,j) \in I} \mathrm{log} h_{(M^{(ij)},\alpha,\sigma^2)}(Y_i,Y_j) $.The question is, how to choose an optimal subset $I$.\\
@@ -415,14 +414,20 @@ We performed simulations in order to illustrate our results. We focus on the cas
 
 
 \section{Conclusion}
-The Poisson log-normal is a model for count data that allow to perform a linear model, \textit{ie} to estime regression parameters taking in account the dependency structure in the data. We here show that estimating the parameters in maximizing the pairwise composite likelihood provide a consistent estimator as well of the regression parameters, as from from the dependency structure (\textit{ie} from the variance and covariance). Furthermore we expect this estimator to be assymptotically normal, which allows to construct confident sets and so to give interpretable results. At least we looked at the case of a structured dependency matrix. We first expected that the numerical results were easier to interpret, but calculations has to be developped, we failed to get an interpretable expression. At least we performed some simulations of our data. The results are in adequation with what we expected and so support to go further in this sense.\\
+The Poisson log-normal is a model for count data that allow to perform a linear model, \textit{ie} to estime regression parameters taking in account the dependency structure in the data. We here show that estimating the parameters in maximizing the pairwise composite likelihood provide a consistent estimator as well of the regression parameters, as of the dependency structure (\textit{ie} from the variance and covariance). Furthermore we expect this estimator to be assymptotically normal, which allows to construct confident sets and so to give interpretable results. At least we looked at the case of a structured dependency matrix. We first expected that the numerical results were easier to interpret, but calculations has to be developped, we failed to get an interpretable expression. At least we performed some simulations of our data. The results are in adequation with what we expected and so support to go further in this sense.\\
 \\
 At the beginning of the project, the idea was to use the PLN-model to estimate the regression parameters in case of spatially structured data. We first thought that it is as easy as what we developped in section 3, but this case doesn't allow to take in account for the covariates. We just give here an insigth and first reflexions on how this model could be adapted to spatial data. \\
-Let's recall the general model for estimation of regression parameters. In the more general case we can expect that there are two types of dependency in the data : the dependency between the observed variables, the one we consider in our model, namely $\Sigma$ on the figure \label{?} and the dependency between the observations, namely $\Gamma$ on the figure. So there is a variance in the observed variable $V(Y) = \Sigma \otimes \Gamma$. In this report, we assumed repetitions to be independant and identically distributed. In this manner, the $\Gamma$ matrix is the identity and thus, we only estimate for the $\Gamma$ matrix. In case of spatial data, we have to adapt the PLN-model because we are interested in the case of estimation of the regression parameters with a (spatial)-dependence structure between the repetitions.
-\begin{figure}
-
+Let's recall the general model for estimation of regression parameters. In the more general case we can expect that there are two types of dependency in the data : the dependency between the observed variables, the one we consider in our model, namely $\Sigma$ on the figure \ref{fig} and the dependency between the observations, namely $\Gamma$ on the figure. So there is a variance in the observed variable $V(Y) = \Sigma \otimes \Gamma$. In this report, we assumed repetitions to be independant and identically distributed. In this manner, the $\Gamma$ matrix is the identity and thus, we only estimate for the $\Gamma$ matrix. In case of spatial data, we have to adapt the PLN-model because we are interested in the case of estimation of the regression parameters with a (spatial)-dependence structure between the repetitions.
+\begin{figure}[!h] \label{fig}
+\includegraphics[scale=0.8]{Dependance.png}
+\caption{Dependance structured in a data set.We use the notation we previously introduced, namely $n$ the number of variables of interest, $N$ the number of repetitions and $d$ the number of covariates}
 \end{figure}
-\nearrow
+
+We give here a first description of the model in case of spatial dependency. If we take the notation of figure \ref{fig}, we consider the case were $n=1$, $N$ is the number of sites in the spatial model, and $d$ the number of covariates. In this case, we consider the matrix $\Sigma$ to be diagonal and the matrix $\Gamma$ to be structured. We note $\mathcal{PLN}_s$ the "spatial" PLN model. This model is parametrised by a vector of regression coefficients $\beta \in \mathbb{R}^d$ and the matrix $\Gamma \in \mathcal{M}_N(\mathbb{R})$. We note $(Y^j)_{j \in \{1,...,N\}}$ the observed variable. Let consider a latent vector $Z \sim \mathcal{N}(0,\Gamma)$. Then :
+\begin{align*}
+Y^j\mid Z^j \sim \mathcal{P}(e^{O+\beta^T X + Z_j})
+\end{align*}
+We think that also in this case, the estimator constructed by maximizing the likelihood over the pairs is a consistent and assymptotically normal estimator of $\beta$ and $\Gamma$. We propose to investigate also the sparse composite likelihood decribed in \ref{sparse}. 
 \newpage  
 \appendix
 \section{Appendix}
