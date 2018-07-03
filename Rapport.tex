@@ -108,9 +108,9 @@ $ \forall X \in \mathbb{R}^d, \forall O \in \mathbb{R}^d, \forall (m_1,...m_n) \
 \end{center}
 \subsubsection{Moments of the Poisson log-normale distribution} Again, following \cite{aitchison1989multivariate}, the moments of the Poisson log-normale distribution can easily be obtained through conditional expectation. Considering the observation $Y^j_i$ is following a Poisson log-normal distribution with  parameters $(M , \Sigma)$ (with $\Sigma= (\sigma_{ij})$), the covariates $X \in \mathcal{M}_{d \times N} ( \mathbb{R})$ and the offset $O \in \mathcal{M}_{n \times N} (\mathbb{R})$ 
 \begin{align*}
-\mathbb{E}(Y^j_i)& =\mathrm{exp}(O_{ij}+ (X^j)^T\mu^i+\frac{1}{2}\sigma_{ii})\\
-\mathbb{V}(Y^j_i)& =\mathrm{exp}(O_{ij}+(X^j)^T \mu^i+\frac{1}{2}\sigma_{ii})+(\mathrm{exp}(O_{ij}+(X^j)^T\mu^i+\frac{1}{2}\sigma_{ii})^2(\mathrm{exp}(\sigma_{ii})-1)\\
-\mathrm{Cov}(Y^j_i,Y^j_k)& =\mathrm{exp}(O_{ij}+(X^j)^T \mu^i+\frac{1}{2}\sigma_{ii})\mathrm{exp}(O_{kj}+(X^j)^T \mu_k+\frac{1}{2}\sigma_{kk})(exp(\sigma_{ik}) - 1)
+\mathbb{E}(Y^j_i)& =\mathrm{exp}(O_{ij}+ (X^j)^T M^{(i)}+\frac{1}{2}\sigma_{ii})\\
+\mathbb{V}(Y^j_i)& =\mathrm{exp}(O_{ij}+(X^j)^T M^{(i)}+\frac{1}{2}\sigma_{ii})+(\mathrm{exp}(O_{ij}+(X^j)^T M^{(i)}+\frac{1}{2}\sigma_{ii})^2(\mathrm{exp}(\sigma_{ii})-1)\\
+\mathrm{Cov}(Y^j_i,Y^j_k)& =\mathrm{exp}(O_{ij}+(X^j)^T M^{(i)}+\frac{1}{2}\sigma_{ii})\mathrm{exp}(O_{kj}+(X^j)^T M^{(k)}+\frac{1}{2}\sigma_{kk})(exp(\sigma_{ik}) - 1)
 \end{align*}
 \subsubsection{Overdispersion}
 From the calculation of the moments, we see that for $Y^j_i$ following a Poisson log-normal distribution :
@@ -131,7 +131,8 @@ $\mathcal{L}_{(Y^1,..Y^N)}(M,\Sigma \mid X,O) = \prod_{j=1}^N h_{(M,\Sigma \mid 
 When the considered density function is in the exponential family, the log-likelihood, expressed as follow, is more appropriated : 
 $\mathcal{L}_{(Y^1,..Y^N)}(M,\Sigma \mid X,O) = \sum_{j=1}^N \mathrm{log} (h_{(M,\Sigma \mid X,O)}(Y^j))$.\\
 \\ 
-In our case, the likelihood function is costly to calculate, because the dependency structure in the data implies to calculate integrals over $\mathbb{R}^n$. Several approached have been proposed in order to symplify the likeiyhood function in the case of complex dependencies. We propose to use the composite likelihood approach (see\cite{varin2011overview}, \cite{pedeli2018pairwise} and \cite{varin2008composite}).\\
+In our case, the likelihood function is costly to calculate, because the dependency structure in the data implies to calculate integrals over $\mathbb{R}^n$. Since the distribution implies a latent variable, it can be tempting to estimate the parameters by Expectation-Minimization (EM). In the case of the Poisson log-normale distribution, there is no closed expression of the a posteriori distribution of $Z$ known $Y$ \cite{Karlis2005}. In this case previous studies proposed to perform estimations of the density. Other authors \cite{chiquet2017variational} proposed to estimate the parameters by a Variational Expectaition-Minimization (VEM) algorithm. However, there exist no  asymptotical guaranties on the consistence or normality of this estimator.
+Several approached have been proposed in order to symplify the likeiyhood function in the case of complex dependencies. We propose to use the composite likelihood approach (see\cite{varin2011overview}, \cite{pedeli2018pairwise} and \cite{varin2008composite}).\\
 \\
 Composite likelihood is expressed as a weighted product of the marginal or conditional density functions.
 \begin{definition}\cite{varin2011overview} Let $Y$ be a $n$-dimensional random vector, with density function $f_\theta$ parametrized by a $p$-dimensional unknown parameter $\theta \in \Theta$.\\
@@ -303,7 +304,7 @@ $\Psi_n(\theta)=\frac{1}{N}\sum_{i=1}^N \Psi_\theta(X_i) = \mathbb{P}_N \Psi_\th
 $\Psi(\theta) = \mathrm{P}\Psi_\theta$
 \end{center}
 \begin{theorem} \cite{vaart_1998} \label{ThAN}
-Let $\Theta$ be an euclidian space. For each $\theta \in \Theta$, let $\theta \mapsto \Psi_\theta (x)$ une fonction $\mathcal{C}^2$ with respect to the variable $x$. Suppose that there exists $\theta_0$, such that $\mathrm{P} \Psi_{\theta_0} =0 $ and $\mathrm{P} \parallel \Psi_{\theta_0} \parallel^2 < \infty$. Indeed, we suppose that the matrix $\mathrm{P} \dot{\Psi}_{\theta_0}$ exists and is non-singular. Assume that the second-order partial derivatives are dominated by a fixed integrable function in the variable  $\ddot{\Psi}$ for every $\theta$ in a neiborhood of $\theta_0$. Consider a consistent estimator sequence $\widehat{\theta}_N$ such that $\Psi_N(\widehat{\theta}_N)=0$, the sequence $\sqrt{n}(\widehat{\theta}_N - \theta_0)$ converges in law to $\mathcal{N}(0,(\mathrm{P} \dot{\Psi}_{\theta_0})^{-1} \mathrm{P} \Psi_{\theta_0} \mathrm{P} \Psi_{\theta_0}^T (\mathrm{P} \dot{\Psi}_{\theta_0})^{-1}))$.
+Let $\Theta$ be an euclidian space. For each $\theta \in \Theta$, let $\theta \mapsto \Psi_\theta (x)$ be a $\mathcal{C}^2$ function with respect to the variable $x$. Suppose that there exists $\theta_0$, such that $\mathrm{P} \Psi_{\theta_0} =0 $ and $\mathrm{P} \parallel \Psi_{\theta_0} \parallel^2 < \infty$. Indeed, we suppose that the matrix $\mathrm{P} \dot{\Psi}_{\theta_0}$ exists and is non-singular. Assume that the second-order partial derivatives are dominated by a fixed integrable function in the variable  $\ddot{\Psi}$ for every $\theta$ in a neiborhood of $\theta_0$. Consider a consistent estimator sequence $\widehat{\theta}_N$ such that $\Psi_N(\widehat{\theta}_N)=0$, the sequence $\sqrt{n}(\widehat{\theta}_N - \theta_0)$ converges in law to $\mathcal{N}(0,(\mathrm{P} \dot{\Psi}_{\theta_0})^{-1} \mathrm{P} \Psi_{\theta_0}  \Psi_{\theta_0}^T (\mathrm{P} \dot{\Psi}_{\theta_0})^{-1}))$.
 \end{theorem}
 \subsubsection{Asymptotic normality of the composite likelihood for the PLN model}
 We want to apply theorem \ref{ThAN} to our problem of M-maximization. In this case the function $\Psi_\theta$ is given by the derivative of the composite likelihood.\\
@@ -395,7 +396,7 @@ One have, by a linear model :
 \end{align*}
 With $E_{ij}$ a noise due to estimation. We estime this noise to be  independant and identically distributed  for all the considered couples. By a classical results for the linear regression model \cite{daudin1999statistique}, one have :
 \begin{center}
-$\mathbb{V}(\widehat{\alpha}) = \rho^2 (\frac{1}{n^2} + \frac{\bar{d}^2}{\sum_{(i,j)\in \{1..n\}^2}(d_ij - \bar{d})^2})$
+$\mathbb{V}(\widehat{\alpha}) = \rho^2 (\frac{1}{n^2} + \frac{\bar{d}^2}{\sum_{(i,j)\in \{1..n\}^2}(d_{ij} - \bar{d})^2})$
 \end{center}
 Where $\rho^2$ is the variance of the error. We want to minimize the variance of $\widehat{\alpha}$. So we will try to maximize the quantity $\sum_{(i,j)\in \{1..n\}^2}(d_{ij} - \bar{d})^2$. This is our second constraint.\\
 \\
@@ -429,15 +430,15 @@ The Poisson log-normal is a model for count data that allow to perform a linear 
 At the beginning of the project, the idea was to use the PLN-model to estimate the regression parameters in case of spatially structured data. We first thought that it is as easy as what we developped in section 3, but this case doesn't allow to take in account the covariates. We just give here an insigth and first reflexions on how this model could be adapted to spatial data. \\
 Let us recall the general model for estimation of regression parameters. In the more general case we can expect that there are two types of dependency in the data : the dependency between the observed variables, the one we consider in our model, namely $\Sigma$ on the figure \ref{fig} and the dependency between the observations, namely $\Gamma$ on the figure. So there is a variance in the observed variable $V(Y) = \Sigma \otimes \Gamma$. In this report, we assumed repetitions to be independant and identically distributed. In this manner, the $\Gamma$ matrix is diagonal and thus, we only estimate for the $\Gamma$ matrix. In case of spatial data, we have to adapt the PLN-model because we are interested in the case of estimation of the regression parameters with a (spatial)-dependence structure between the repetitions.
 \begin{figure}[!h] \label{fig}
-\includegraphics[scale=0.8]{Dependance.png}
+\includegraphics[scale=0.4]{Dependance_2.pdf}
 \caption{Dependance structured in a data set.We use the notation we previously introduced, namely $n$ the number of variables of interest, $N$ the number of repetitions and $d$ the number of covariates}
 \end{figure}
 
-We give here a first description of the model in case of spatial dependency. If we take the notation of figure \ref{fig}, we consider the case were $n=1$, $N$ is the number of sites in the spatial model, and $d$ the number of covariates. In this case, we consider the matrix $\Sigma$ to be diagonal and the matrix $\Gamma$ to be structured. We note $\mathcal{PLN}_s$ the "spatial" PLN model. This model is parametrised by a vector of regression coefficients $\beta \in \mathbb{R}^d$ and the matrix $\Gamma \in \mathcal{M}_N(\mathbb{R})$. We note $(Y^j)_{j \in \{1,...,N\}}$ the observed variable. Let consider a latent vector $Z \sim \mathcal{N}(0,\Gamma)$. Then :
+We give here a first description of the model in case of spatial dependency. If we take the notation of figure \ref{fig}, we consider the case were $n=1$, $N$ is the number of sites in the spatial model, and $d$ the number of covariates. We consider the matrix  $\Gamma$ to be structured. We note $\mathcal{PLN}_s$ the "spatial" PLN model. This model is parametrised by a vector of regression coefficients $\beta \in \mathbb{R}^d$ and the matrix $\Gamma \in \mathcal{M}_N(\mathbb{R})$. We note $(Y^j)_{j \in \{1,...,N\}}$ the observed variable. Let consider a latent vector $Z \sim \mathcal{N}(0,\Gamma)$. Then :
 \begin{align*}
-Y^j\mid Z^j \sim \mathcal{P}(e^{O+\beta^T X + Z_j})
+Y^j\mid Z^j \sim \mathcal{P}(e^{O_j+\beta^T X_j + Z_j})
 \end{align*}
-We think that also in this case, the estimator constructed by maximizing the pairwise composite likelihood over the pairs is a consistent and assymptotically normal estimator of $\beta$ and $\Gamma$. We propose to investigate also the sparse composite likelihood decribed in \ref{sparse}.\\
+We think that also in this case, the estimator constructed by maximizing the pairwise composite likelihood over the pairs is a consistent and assymptotically normal estimator of $\beta$ and $\Gamma$. We propose to investigate also the sparse composite likelihood decribed in \ref{sparse}. We can generalize this model to $n \leq 1$. The matrix $\Sigma$ is then considered diagonal.\\
 \\
 At least it is tempting to try to develop a method taking in account both dependency structure. Let note $\mathcal{CL}_o{(M,\Sigma)}=\sum_{j=1}^N \sum_{1 \leq i<k \leq n} \mathrm{log}(Y^j_i, Y^j_k)$ the composite likelihood over the pairs of variables of interest and $\mathcal{CL}_s(M^T,\Gamma) = \sum_{i=1}^n \sum_{1 \leq j<l \leq N} \mathrm{log}(Y^j_i, Y^l_i)$ the composite likelihood over the pairs of observations. We propose that by maximizing the sum of this both likelihoods, \textit{ie} $\mathcal{CL}_o (M, \Sigma) + \mathcal{CL}_s (M^T, \Gamma)$, we construct an consistent and assymptotically normal estimator of the parameters, taking in account for all the dependency structure in a dataset.
 \newpage  
@@ -667,6 +668,7 @@ Derivating under $\int \int$, one have :
   +  \int \int z_j(Y_j f_{(e^{M^{(j)} X + z_j})}(Y_j) - (Y_j+1) f_{(e^{M^{(j)} X + z_j})}(Y_j+1))g_{(\alpha,\sigma^2)} (z_i,z_j) \mathrm{d}z_i \mathrm{d} z_j
  \end{align*}
 We are not able to estime this quantity and so stopped here our calculations.
+\newpage
 \bibliographystyle{plain}
 \bibliography{Biblio.bib}
 \end{document}
