@@ -90,7 +90,7 @@
 \usepackage{graphics}
 
 \title % (optional, use only with long paper titles)
-{Estimation par maximum de vraisemblance composite des parametres du modèle Poisson log-normal}
+{Estimation par maximum de vraisemblance composite des paramètres du modèle Poisson log-normal}
 
 \subtitle{Mémoire de M2 réalisé sous la supervision de Stéphane Robin}
 
@@ -160,7 +160,7 @@
 %\vspace{1cm}
 \begin{figure}
 \includegraphics[scale=0.3]{Plant_polinisator.png}
-\caption{Exemple d'un réseau plant-pollinisateurs} 
+\caption{Exemple d'un réseau plantes-pollinisateurs} 
 \end{figure}
 \end{frame}
 
@@ -256,7 +256,7 @@ Then any sequence of estimators $\widehat{\theta}_N$ with $\mathrm{M}_N(\widehat
 \begin{frame}
 \frametitle{Consistance du maximum de la vraisemblance composite pour le modèle poisson log normal}
 \begin{theorem}
-The estimator $(\widehat{M}_N,\widehat{\Sigma}_N)$ constructed by maximizing the composite pairwise likelihood for $(Y^j_1,...Y^j_n)_{j \in \{1...N\}}$ is a consistent estimator of the correlation coefficients $M$ and of the matrix of variance-covariance $\Sigma$.
+The estimator $(\widehat{M}_N,\widehat{\Sigma}_N)$ constructed by maximizing the composite pairwise likelihood for $(Y^j_1,...Y^j_n)_{j \in \{1...N\}}$ is a consistent estimator of the correlation coefficients $M^\ast$ and of the matrix of variance-covariance $\Sigma^\ast$.
 \end{theorem}
 \end{frame}
 \begin{frame}
@@ -264,9 +264,9 @@ The estimator $(\widehat{M}_N,\widehat{\Sigma}_N)$ constructed by maximizing the
 \begin{enumerate}
 \item Par la LFGN :
 \begin{align*}
-\underset{(M,\Sigma)}{\mathrm{sup}} \mid \mathcal{M}_N(M, \Sigma)- \mathbb{E}_X [\mathbb{E}_{Y_i,Y_k \mid X} [ \mathrm{log}(h_{(M,\Sigma \mid X)} (Y_i,Y_k))]] \mid\overset{\mathbb{P}}{\longrightarrow}  0
+\underset{(M,\Sigma)}{\mathrm{sup}} \mid \mathcal{M}_N(M, \Sigma)- \mathbb{E}_X [\sum_{1 \leq i <k \leq n} \mathbb{E}_{Y_i,Y_k \mid X} [ \mathrm{log}(h_{(M,\Sigma \mid X)} (Y_i,Y_k))]] \mid\overset{\mathbb{P}}{\longrightarrow}  0
 \end{align*} 
-\item Existence et unicité du maximum de $\mathcal{M}(M,\Sigma) = \mathbb{E}_X [\mathbb{E}_{Y_i,Y_k \mid X} [ \mathrm{log}(h_{(M,\Sigma \mid X)} (Y_i,Y_k))]]$.
+\item Existence et unicité du maximum de $\mathcal{M}(M,\Sigma) = \mathbb{E}_X [\sum_{1 \leq i < k \leq n} \mathbb{E}_{Y_i,Y_k \mid X} [ \mathrm{log}(h_{(M,\Sigma \mid X)} (Y_i,Y_k))]]$.
 \begin{itemize}
 \item Identifiabilité du modèle (par les moments)
 \item Existence d'un maximum (divergence de Kullback)
@@ -310,7 +310,7 @@ On a
 \begin{align*}
 \mathbb{E}_X[\mathbb{E}_{(M^{\ast},\Sigma^{\ast} \mid X)}&[\mathrm{log}(h_{(M^{\ast},\Sigma^{\ast} \mid X)}(Y_i,Y_k)) - \mathrm{log}(h_{(M,\Sigma\mid X)}(Y_j,Y_k))]] \\
 & = \mathbb{E}_X[\mathrm{D_{KL}}(h_{(M^\ast,\Sigma^\ast \mid X)}\parallel h_{(M,\Sigma \mid X)})]\\
-& = \mathbb{E}_X[\mathbb{E}_{(M\,\Sigma^{\ast} \mid X)}[\mathrm{log}(h_{(M^{\ast},\Sigma^{\ast} \mid X)}(Y_i,Y_k))]] - \mathrm{M}(M,\Sigma)
+& = \mathbb{E}_X[\mathbb{E}_{(M^{\ast},\Sigma^{\ast} \mid X)}[\mathrm{log}(h_{(M^{\ast},\Sigma^{\ast} \mid X)}(Y_i,Y_k))]] - \mathrm{M}(M,\Sigma)
 \end{align*}
 Maximiser la vraisemblance composite revient à minimiser la divergence de Kullback. \
 $\mathrm{D_{KL}} \geq 0$, 
